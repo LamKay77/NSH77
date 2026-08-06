@@ -1,0 +1,3000 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>逆水寒助手</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=ZCOOL+KuaiLe&display=swap');
+
+        :root {
+            --bg: #e9f3fb;
+            --bg-top: #f5fafe;
+            --card-bg: #ffffff;
+            --primary: #4a90c2;
+            --primary-dark: #3a78a8;
+            --primary-light: #bfe0f2;
+            --accent: #6aa9d9;
+            --soft-blue: #eef6fc;
+            --blue-border: #cfe4f3;
+            --cinnabar: #ef9a8d;
+            --text: #314c5e;
+            --text-secondary: #6b8299;
+            --border: #dce9f2;
+            --border-light: #eef4f9;
+            --danger: #e0796f;
+            --danger-bg: #fdf0ee;
+            --success: #5cb388;
+            --success-bg: #ecf7f1;
+            --info: #5b9bd5;
+            --info-bg: #eef6fc;
+            --shadow-sm: 0 3px 10px rgba(74, 144, 194, 0.08);
+            --shadow-md: 0 8px 22px rgba(74, 144, 194, 0.12);
+            --shadow-lg: 0 14px 34px rgba(74, 144, 194, 0.16);
+            --radius-sm: 10px;
+            --radius: 14px;
+            --radius-lg: 22px;
+            --transition: 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* ========== 温和淡蓝背景 ========== */
+        .bg-deco {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            pointer-events: none;
+            background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg) 100%);
+        }
+        .bg-deco::before {
+            content: "";
+            position: absolute;
+            top: -120px; left: -80px;
+            width: 420px; height: 420px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(143, 193, 224, 0.35) 0%, transparent 70%);
+        }
+        .bg-deco::after {
+            content: "";
+            position: absolute;
+            bottom: -140px; right: -100px;
+            width: 460px; height: 460px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(159, 211, 184, 0.28) 0%, transparent 70%);
+        }
+
+        body {
+            font-family: "Noto Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+            min-height: 100vh;
+            padding: 24px 16px 50px;
+            position: relative;
+        }
+
+        .container {
+            max-width: 1120px;
+            margin: 0 auto;
+        }
+
+        /* ========== Header ========== */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            animation: fade-up 0.6s ease both;
+        }
+        .seal-logo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 62px;
+            height: 62px;
+            background: linear-gradient(135deg, #7cc0e8 0%, #4a90c2 100%);
+            border-radius: 18px;
+            box-shadow: 0 8px 18px rgba(74, 144, 194, 0.35);
+            margin-bottom: 14px;
+            position: relative;
+        }
+        .seal-logo::after {
+            content: "";
+            position: absolute;
+            inset: 5px;
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 13px;
+        }
+        .seal-logo span {
+            font-family: "ZCOOL KuaiLe", "Noto Sans SC", sans-serif;
+            font-size: 34px;
+            color: #ffffff;
+            line-height: 1;
+        }
+        .header h1 {
+            font-family: "ZCOOL KuaiLe", "Noto Sans SC", sans-serif;
+            font-size: 2.0rem;
+            font-weight: 400;
+            color: var(--primary-dark);
+            letter-spacing: 0.02em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .header .subtitle-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+        .header .subtitle {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+        .author-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--soft-blue);
+            color: var(--primary-dark);
+            border: 1.5px solid var(--blue-border);
+            padding: 3px 14px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 500;
+        }
+
+        /* ========== Cards (Q版卡牌) ========== */
+        .card {
+            background: var(--card-bg);
+            border: 1.5px solid var(--blue-border);
+            border-radius: var(--radius-lg);
+            padding: 26px 24px;
+            margin-bottom: 22px;
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition);
+            position: relative;
+            overflow: hidden;
+            animation: fade-up 0.6s ease both;
+        }
+        .card::before {
+            content: "";
+            position: absolute;
+            top: -3px; left: 50%;
+            transform: translateX(-50%);
+            width: 64px; height: 7px;
+            border-radius: 8px;
+            background: var(--accent);
+        }
+        .card--blue::before { background: #6aa9d9; }
+        .card--coral::before { background: #f4a59a; }
+        .card--mint::before { background: #9fd3b8; }
+        .card--purple::before { background: #b79cd8; }
+        .card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .card-header .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #fff;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+        }
+        .badge-module1 { background: linear-gradient(135deg, #8fc1e6, #4a90c2); }
+        .badge-module2 { background: linear-gradient(135deg, #f7b8ad, #e89284); }
+        .badge-module3 { background: linear-gradient(135deg, #b3e0c8, #5cb388); }
+        .badge-ocr { background: linear-gradient(135deg, #c6aee0, #9b7fd0); }
+
+        .card-header h2 {
+            font-family: "Noto Sans SC", sans-serif;
+            font-size: 1.28rem;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: 0.01em;
+        }
+        .card-header .hint {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            margin-left: auto;
+            font-weight: 400;
+        }
+
+        /* ========== Layout ========== */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+        }
+        @media (max-width: 860px) {
+            .two-col { grid-template-columns: 1fr; }
+            .card { padding: 18px 16px; }
+            .header h1 { font-size: 1.6rem; }
+        }
+
+        /* ========== Forms ========== */
+        label {
+            display: block;
+            font-size: 0.86rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+        input[type="number"],
+        input[type="text"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 0.92rem;
+            font-family: inherit;
+            color: var(--text);
+            background: #fff;
+            transition: all var(--transition);
+            outline: none;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(106, 169, 217, 0.18);
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            opacity: 1;
+            height: 26px;
+        }
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%234a90c2'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            padding-right: 30px;
+        }
+
+        /* Highlight Input */
+        .highlight-box {
+            background: var(--soft-blue);
+            border: 1.5px solid var(--blue-border);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            margin-bottom: 16px;
+            position: relative;
+        }
+        .highlight-box::before {
+            content: "宜";
+            position: absolute;
+            top: -10px; left: 12px;
+            background: var(--accent);
+            color: #fff;
+            font-size: 0.7rem;
+            width: 20px; height: 20px;
+            line-height: 20px;
+            text-align: center;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(74,144,194,0.3);
+        }
+        .highlight-input {
+            font-weight: 700;
+            color: var(--primary-dark) !important;
+            font-size: 1.05rem !important;
+            border-color: var(--blue-border) !important;
+        }
+
+        /* ========== Price Table ========== */
+        .price-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.9rem;
+        }
+        .price-table th {
+            text-align: left;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            padding: 8px 10px;
+            border-bottom: 2px solid var(--border-light);
+        }
+        .price-table td {
+            padding: 6px 6px;
+            border-bottom: 1px solid var(--border-light);
+            vertical-align: middle;
+        }
+        .btn-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            border: 1.5px solid var(--border);
+            background: #fff;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            transition: all var(--transition);
+        }
+        .btn-icon:hover {
+            background: var(--danger-bg);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            border-radius: 22px;
+            border: 1.5px solid var(--border);
+            background: #fff;
+            cursor: pointer;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all var(--transition);
+            font-family: inherit;
+        }
+        .btn-sm:hover {
+            background: var(--soft-blue);
+            border-color: var(--accent);
+            color: var(--primary-dark);
+        }
+        .btn-sm.primary {
+            background: linear-gradient(135deg, #7cc0e8 0%, #4a90c2 100%);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(74,144,194,0.28);
+        }
+        .btn-sm.primary:hover {
+            filter: brightness(1.05);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(74,144,194,0.34);
+        }
+        .btn-sm:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            filter: grayscale(0.2);
+        }
+        .btn-sm.primary:disabled:hover {
+            background: linear-gradient(135deg, #7cc0e8 0%, #4a90c2 100%);
+            border-color: transparent;
+            color: #fff;
+            transform: none;
+        }
+
+        /* ========== OCR Option Styling ========== */
+        .ocr-radio-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            background: var(--soft-blue);
+            padding: 6px;
+            border-radius: var(--radius-sm);
+            border: 1.5px solid var(--blue-border);
+            width: fit-content;
+        }
+        .ocr-radio-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.86rem;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 4px 12px;
+            border-radius: 8px;
+            transition: all var(--transition);
+            margin-bottom: 0;
+            user-select: none;
+        }
+        .ocr-radio-label input[type="radio"] {
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+        .ocr-warning-box {
+            display: none;
+            margin-top: 12px;
+            padding: 10px 14px;
+            background: #fff6e0;
+            border: 1.5px solid #ffe6a8;
+            border-radius: var(--radius-sm);
+            color: #9a7212;
+            font-size: 0.83rem;
+            line-height: 1.5;
+        }
+
+        /* ========== Module 2: Orders ========== */
+        .order-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .order-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            background: #fff;
+            border-radius: var(--radius-sm);
+            border: 1.5px solid var(--border-light);
+            transition: all var(--transition);
+        }
+        .order-row:hover {
+            border-color: var(--primary-light);
+        }
+        .order-row.active-order {
+            border-color: var(--accent);
+            background: var(--soft-blue);
+            box-shadow: inset 3px 0 0 var(--accent);
+        }
+        .order-num {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 0.88rem;
+            min-width: 26px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .order-row select {
+            flex: 2;
+            min-width: 100px;
+            font-size: 0.85rem;
+            padding: 7px 24px 7px 8px;
+        }
+        .order-row .qty-input,
+        .order-row .reward-input {
+            flex: 1;
+            min-width: 50px;
+            text-align: center;
+            padding: 7px 6px;
+            font-size: 0.88rem;
+        }
+        .order-row .inline-label {
+            font-size: 0.76rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* Custom Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 42px;
+            height: 24px;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #cfdde8;
+            border-radius: 24px;
+            transition: all var(--transition);
+        }
+        .toggle-slider::before {
+            content: "";
+            position: absolute;
+            height: 18px; width: 18px;
+            left: 3px; bottom: 3px;
+            background: #fff;
+            border-radius: 50%;
+            transition: all var(--transition);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .toggle-switch input:checked + .toggle-slider {
+            background: var(--accent);
+        }
+        .toggle-switch input:checked + .toggle-slider::before {
+            transform: translateX(18px);
+        }
+        .order-summary-mini {
+            font-size: 0.78rem;
+            min-width: 65px;
+            text-align: right;
+            flex-shrink: 0;
+            font-weight: 500;
+        }
+
+        /* ========== Module 3: Results ========== */
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+        @media (max-width: 680px) {
+            .results-grid { grid-template-columns: 1fr; }
+        }
+        .result-panel {
+            background: #fff;
+            border-radius: var(--radius);
+            padding: 18px;
+            border: 1.5px solid var(--border-light);
+        }
+        .result-panel.highlight-panel {
+            border-color: var(--blue-border);
+            background: linear-gradient(135deg, #ffffff 0%, var(--soft-blue) 100%);
+            box-shadow: var(--shadow-sm);
+        }
+        .result-panel h3 {
+            font-family: "Noto Sans SC", sans-serif;
+            font-size: 1.02rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .result-panel h3 .icon-dot {
+            width: 9px; height: 9px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .dot-blue { background: var(--accent); }
+        .dot-mint { background: var(--success); }
+
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        .result-table th, .result-table td {
+            padding: 8px 6px;
+            text-align: right;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .result-table th {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        .result-table th:first-child, .result-table td:first-child { text-align: left; }
+        .result-table .total-row {
+            font-weight: 700;
+            font-size: 0.92rem;
+            border-top: 2px solid var(--border);
+        }
+
+        .profit-positive { color: var(--success); font-weight: 700; }
+        .profit-negative { color: var(--danger); font-weight: 700; }
+        .big-number { font-size: 1.65rem; font-weight: 700; font-family: "ZCOOL KuaiLe", "Noto Sans SC", sans-serif; letter-spacing: 0.01em; }
+
+        .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .tag-blue { background: var(--soft-blue); color: var(--primary-dark); }
+        .tag-green { background: var(--success-bg); color: var(--success); }
+        .tag-red { background: var(--danger-bg); color: var(--danger); }
+        .tag-gold { background: #fef3d5; color: #b07d1e; }
+
+        .bonus-highlight {
+            background: var(--soft-blue);
+            border: 1.5px dashed var(--blue-border);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            text-align: center;
+            margin-top: 6px;
+        }
+        .bonus-highlight .bonus-amount {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            font-family: "ZCOOL KuaiLe", "Noto Sans SC", sans-serif;
+        }
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border-light);
+            margin: 14px 0;
+        }
+        .fee-note {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+        }
+        .footer strong {
+            color: var(--primary);
+        }
+
+        /* ========== OCR overlay ========== */
+        .ocr-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(49, 76, 94, 0.45);
+            backdrop-filter: blur(2px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .ocr-overlay.show { display: flex; }
+        .ocr-modal {
+            background: #fff;
+            border-radius: var(--radius-lg);
+            padding: 30px 34px 26px;
+            width: 260px;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            border: 1.5px solid var(--blue-border);
+        }
+        .ocr-spinner {
+            width: 46px;
+            height: 46px;
+            margin: 0 auto 16px;
+            border: 4px solid var(--blue-border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: ocr-spin 0.9s linear infinite;
+        }
+        @keyframes ocr-spin { to { transform: rotate(360deg); } }
+        .ocr-check { display: none; font-size: 44px; margin-bottom: 10px; line-height: 1; }
+        .ocr-status {
+            font-size: 1.05rem;
+            font-weight: 500;
+            color: var(--text);
+            font-family: "Noto Sans SC", sans-serif;
+        }
+        .ocr-close-btn {
+            display: none;
+            margin-top: 18px;
+            padding: 8px 24px;
+            border-radius: 22px;
+            border: none;
+            background: linear-gradient(135deg, #7cc0e8 0%, #4a90c2 100%);
+            color: #fff;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all var(--transition);
+            font-family: inherit;
+        }
+        .ocr-close-btn:hover { filter: brightness(1.05); }
+        .ocr-modal.done .ocr-spinner { display: none; }
+        .ocr-modal.done .ocr-check { display: block; }
+        .ocr-modal.done .ocr-close-btn { display: inline-block; }
+        .ocr-modal.error .ocr-status { color: var(--danger); }
+
+        @keyframes fade-up {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ================= 新增：标签页导航 ================= */
+        .tab-bar {
+            position: sticky; top: 8px; z-index: 900;
+            display: flex; gap: 8px; flex-wrap: nowrap;
+            overflow-x: auto; padding: 8px;
+            background: rgba(245, 250, 254, 0.92);
+            backdrop-filter: blur(6px);
+            border: 1.5px solid var(--blue-border);
+            border-radius: var(--radius-lg);
+            margin-bottom: 22px;
+            box-shadow: var(--shadow-md);
+            scrollbar-width: thin;
+        }
+        .tab-btn {
+            flex-shrink: 0;
+            border: 1.5px solid var(--blue-border);
+            background: #fff;
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 9px 18px;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+        .tab-btn:hover { border-color: var(--accent); color: var(--primary-dark); }
+        .tab-btn.active {
+            background: linear-gradient(135deg, #7cc0e8 0%, #4a90c2 100%);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(74, 144, 194, 0.3);
+        }
+        .tab-panel { animation: fade-up 0.45s ease both; }
+        .section-note {
+            font-size: 0.8rem; color: var(--text-secondary);
+            background: var(--soft-blue); border: 1.5px dashed var(--blue-border);
+            border-radius: var(--radius-sm); padding: 8px 12px; margin-bottom: 14px;
+        }
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-top: 14px; }
+        .stat-box { background: var(--soft-blue); border: 1.5px solid var(--blue-border); border-radius: var(--radius-sm); padding: 12px 14px; text-align: center; }
+        .stat-box .stat-label { font-size: 0.76rem; color: var(--text-secondary); }
+        .stat-box .stat-value { font-size: 1.25rem; font-weight: 700; color: var(--primary-dark); font-family: "ZCOOL KuaiLe", "Noto Sans SC", sans-serif; margin-top: 2px; }
+        .strategy-row {
+            display: grid;
+            grid-template-columns: minmax(150px, 1.4fr) repeat(3, 1fr);
+            gap: 8px; align-items: center;
+            padding: 10px 12px;
+            border: 1.5px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            background: #fff;
+            margin-bottom: 8px;
+        }
+        .strategy-row.best-row { border-color: var(--blue-border); background: linear-gradient(135deg, #fff, var(--soft-blue)); }
+        .strategy-row .s-name { font-weight: 600; color: var(--text); font-size: 0.9rem; }
+        .strategy-row .s-cell { font-size: 0.8rem; color: var(--text-secondary); text-align: right; }
+        .strategy-row .s-cell strong { font-size: 0.95rem; }
+        .guild-table-wrap { overflow-x: auto; }
+        .guild-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.78rem; min-width: 0; table-layout: fixed; }
+        .guild-table th { font-size: 0.68rem; font-weight: 500; color: var(--text-secondary); padding: 4px 2px; border-bottom: 2px solid var(--border-light); white-space: nowrap; text-align: left; }
+        .guild-table td { padding: 2px; border-bottom: 1px solid var(--border-light); vertical-align: middle; }
+        .guild-table input {
+            width: 100%; padding: 2px 3px; font-size: 0.7rem;
+            border: 1px solid var(--border); border-radius: 4px;
+            outline: none; font-family: inherit; color: var(--text); background: #fff;
+            transition: all var(--transition);
+            box-sizing: border-box;
+        }
+        .guild-table input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(106, 169, 217, 0.15); }
+        .guild-mat { display: flex; gap: 1px; align-items: center; }
+        .guild-mat .g-name { min-width: 0; flex: 1 1 46%; }
+        .guild-mat .g-num { min-width: 0; flex: 0 0 30px; text-align: center; }
+        .guild-mat .g-price { min-width: 0; flex: 0 0 40px; text-align: right; }
+        .guild-mat .g-x { color: var(--text-secondary); font-size: 0.6rem; flex-shrink: 0; padding: 0 1px; }
+        .cost-cell { text-align: right; font-weight: 700; color: var(--primary-dark); white-space: nowrap; }
+        .sale-cell { white-space: nowrap; }
+        .formula-box {
+            background: var(--soft-blue);
+            border: 1.5px dashed var(--blue-border);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            font-size: 0.8rem; color: var(--text-secondary); line-height: 1.75;
+        }
+        .formula-box b { color: var(--primary-dark); }
+        .log-list { max-height: 46vh; overflow-y: auto; }
+        .log-item { display: flex; justify-content: space-between; gap: 10px; padding: 8px 10px; border-bottom: 1px solid var(--border-light); font-size: 0.82rem; }
+        .log-item .log-time { color: var(--text-secondary); font-size: 0.74rem; white-space: nowrap; }
+        .log-item .log-diff .old { color: var(--danger); text-decoration: line-through; }
+        .log-item .log-diff .new { color: var(--success); font-weight: 600; }
+        .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+        .status-dot.on { background: var(--success); animation: pulse-dot 1.6s ease infinite; }
+        @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+        .rank-row { display: grid; grid-template-columns: 34px 1fr repeat(4, 84px); gap: 8px; align-items: center; padding: 8px 10px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem; }
+        .rank-row.head { color: var(--text-secondary); font-size: 0.74rem; border-bottom: 2px solid var(--border-light); font-weight: 500; }
+        .rank-row .r-num { color: var(--primary); font-weight: 700; font-family: "JetBrains Mono", monospace; }
+        .rank-row .r-name { font-weight: 600; display: flex; align-items: center; gap: 6px; }
+        .rank-row .r-right { text-align: right; }
+        .rank-row.best { background: linear-gradient(135deg, #fff, #fdf3d7); border: 1.5px solid #ffe6a8; border-radius: var(--radius-sm); }
+        .star { color: #d4a843; }
+        @media (max-width: 720px) {
+            .strategy-row { grid-template-columns: 1fr 1fr; }
+            .strategy-row .s-name { grid-column: 1 / -1; }
+            .rank-row { grid-template-columns: 28px 1fr 84px 84px; }
+            .rank-row .hide-m { display: none; }
+        }
+
+        /* ================= 会员系统 ================= */
+        .member-bar {
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 10px;
+            background: linear-gradient(135deg, #ffffff, var(--soft-blue));
+            border: 1.5px solid var(--blue-border);
+            border-radius: var(--radius-lg);
+            padding: 10px 16px;
+            margin-bottom: 10px;
+            box-shadow: var(--shadow-sm);
+        }
+        .member-bar .member-status { font-size: 0.85rem; color: var(--text-secondary); }
+        .member-bar .member-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .lv-tag { display: inline-block; padding: 1px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+        .lv-1 { background: var(--soft-blue); color: var(--primary-dark); }
+        .lv-2 { background: #fef3d5; color: #b07d1e; }
+        .lv-3 { background: var(--danger-bg); color: var(--danger); }
+        .sync-hint {
+            font-size: 0.8rem; color: var(--text-secondary); text-align: center;
+            margin: 0 0 16px;
+        }
+        .auth-overlay {
+            position: fixed; inset: 0;
+            background: rgba(49, 76, 94, 0.45);
+            backdrop-filter: blur(2px);
+            display: none; align-items: center; justify-content: center;
+            z-index: 9990; padding: 16px;
+        }
+        .auth-modal {
+            background: #fff;
+            border: 1.5px solid var(--blue-border);
+            border-radius: var(--radius-lg);
+            padding: 26px 26px 22px;
+            width: 340px; max-width: 100%;
+            box-shadow: var(--shadow-lg);
+        }
+        .auth-modal h3 { font-size: 1.1rem; margin-bottom: 14px; color: var(--primary-dark); }
+        .auth-modal label { margin-bottom: 4px; }
+        .auth-modal input { margin-bottom: 12px; }
+        .auth-error { color: var(--danger); font-size: 0.82rem; min-height: 18px; margin-bottom: 6px; }
+        .auth-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+        .admin-modal { width: 520px; max-width: 100%; }
+        .admin-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+        .admin-list { max-height: 46vh; overflow-y: auto; }
+        .admin-row {
+            display: flex; justify-content: space-between; align-items: center; gap: 10px;
+            padding: 8px 6px; border-bottom: 1px solid var(--border-light); font-size: 0.85rem;
+        }
+        .admin-row .admin-ops { display: flex; gap: 6px; flex-shrink: 0; }
+        .admin-row .admin-ops .btn-sm { padding: 4px 10px; font-size: 0.75rem; }
+        .admin-row small { color: var(--text-secondary); }
+        .admin-empty { text-align: center; color: var(--text-secondary); padding: 20px; }
+        .admin-log .old { color: var(--danger); text-decoration: line-through; }
+        .admin-log .new { color: var(--success); font-weight: 600; }
+        .admin-log .log-time { color: var(--text-secondary); font-size: 0.74rem; white-space: nowrap; }
+    </style>
+</head>
+<body>
+    <div class="bg-deco"></div>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="seal-logo"><span>逆</span></div>
+            <h1>逆水寒助手</h1>
+            <div class="subtitle-row">
+                <span class="subtitle">订单精准核算 & 最佳提交策略规划</span>
+                <span class="author-badge">作者：Vasuki</span>
+            </div>
+        </div>
+
+        <!-- ===== 会员系统栏 ===== -->
+        <div class="member-bar" id="memberBar">
+            <span class="member-status" id="memberStatus">未登录 · 改价仅保存在本机</span>
+            <span class="member-actions" id="memberActions"></span>
+        </div>
+        <div class="sync-hint" id="syncHint">☁️ 云端价格共享：高级会员上传后，全员每 30 秒自动拉取最新价格</div>
+
+        <!-- ===== 标签页导航 ===== -->
+        <nav class="tab-bar" id="mainTabBar">
+            <button class="tab-btn active" data-tab="freight" onclick="switchTab('freight')">🚚 货运收益计算</button>
+            <button class="tab-btn" data-tab="craftsman" onclick="switchTab('craftsman')">⚒️ 生活利润计算</button>
+            <button class="tab-btn" data-tab="prices" onclick="switchTab('prices')">📦 货运道具价格</button>
+            <button class="tab-btn" data-tab="price" onclick="switchTab('price')">📊 工匠采集价格</button>
+            <button class="tab-btn" data-tab="auction" onclick="switchTab('auction')">🎯 拍卖计算器</button>
+        </nav>
+
+        <!-- ===== 面板一：货运收益计算 ===== -->
+        <div class="tab-panel" id="panel-freight">
+
+        <!-- OCR 截图文本识别导入模块 -->
+        <div class="card card--purple" id="moduleOcr">
+            <div class="card-header">
+                <span class="badge badge-ocr">📷</span>
+                <h2>OCR 截图识别文本快捷导入</h2>
+                <span class="hint">智能解析填充订单</span>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+                <div class="ocr-radio-group">
+                    <label class="ocr-radio-label">
+                        <input type="radio" name="ocrSource" value="qq" checked> 🐧 QQ OCR 识别
+                    </label>
+                    <label class="ocr-radio-label">
+                        <input type="radio" name="ocrSource" value="wechat"> 💬 微信 OCR 识别
+                    </label>
+                </div>
+                <button class="btn-sm primary" onclick="parseAndFillOCR()">⚡ 解析并自动填充订单</button>
+            </div>
+
+            <textarea id="ocrInput" rows="5" placeholder="请将 QQ 或 微信 截图识别出来的文本粘贴到此处..."></textarea>
+<div style="margin-top:14px;padding:14px;background:#fff;border:1.5px dashed var(--blue-border);border-radius:var(--radius-sm);">
+<label style="font-weight:500;color:var(--primary-dark);">🤖 AI 截图识别（支持 Ctrl+V 粘贴截图）</label>
+
+<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:8px;">
+<input type="file" id="ocrImageInput" accept="image/*">
+<button class="btn-sm primary" onclick="aiOCRRecognize()">🚀 AI识别截图</button>
+</div>
+
+<div style="margin-top:8px;font-size:0.82rem;color:var(--text-secondary);">
+💡 可以直接在页面按 Ctrl+V 粘贴游戏截图。
+</div>
+
+<img id="ocrPreview" style="display:none;max-width:300px;margin-top:10px;border-radius:8px;">
+</div>
+
+            
+            <div id="ocrNotice" class="ocr-warning-box">
+                ⚠️ <strong>注意：</strong> OCR 识别受图片清晰度和文字排列影响，可能存在错别字或数字识别遗漏。<strong>解析完成后请务必人工核对下方 8 个订单！</strong>
+            </div>
+        </div>
+
+        <!-- Two-Column Layout -->
+        <div class="two-col">
+            <!-- 模块一：价格设置 -->
+            <div class="card card--blue" id="module1">
+                <div class="card-header">
+                    <span class="badge badge-module1">①</span>
+                    <h2>基础价格设置</h2>
+                </div>
+
+                <div class="highlight-box">
+                    <label style="color:var(--primary-dark);font-weight:500;">📜 宝图残页单价（拍卖行售价）</label>
+                    <input type="number" id="treasureMapPrice" class="highlight-input" value="12000" min="0" step="1" placeholder="输入宝图残页单价">
+                    <div class="fee-note">💡 拍卖行出售自动扣除 <strong>5% 手续费</strong>（实际到手 95%）</div>
+                </div>
+
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                    <label style="margin-bottom:0;">📦 道具成本价格表（拍卖行买入价）</label>
+                    <button class="btn-sm" onclick="switchTab('prices')">📦 维护全部道具价格</button>
+                </div>
+                <div class="section-note">💡 本表仅显示当前 8 个订单用到的道具，价格与「货运道具价格」标签页双向同步。</div>
+                <div style="overflow-x:auto;">
+                    <table class="price-table">
+                        <thead>
+                            <tr>
+                                <th style="width:45%;">道具名称</th>
+                                <th style="width:40%;">单价（铜钱）</th>
+                                <th style="width:15%;text-align:center;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="priceTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 模块二：订单配置 -->
+            <div class="card card--coral" id="module2">
+                <div class="card-header">
+                    <span class="badge badge-module2">②</span>
+                    <h2>货运订单配置</h2>
+                    <span class="hint">共 8 个订单</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+                    <span style="font-size:0.8rem;color:var(--text-secondary);">快捷操作：</span>
+                    <button class="btn-sm" onclick="toggleAllOrders(true)">✅ 全部启用</button>
+                    <button class="btn-sm" onclick="toggleAllOrders(false)">⬜ 全部禁用</button>
+                    <button class="btn-sm" onclick="enableTopOrders()">⭐ 推荐收益前5</button>
+                </div>
+                <div class="order-list" id="orderList">
+                </div>
+                <div style="margin-top:12px;font-size:0.82rem;color:var(--text-secondary);text-align:center;">
+                    已启用：<strong id="activeOrderCount" style="color:var(--primary);">0</strong> / 8 个订单
+                    &nbsp;|&nbsp; 宝箱档位：<strong id="bonusTierDisplay">—</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- 模块三：收益计算 -->
+        <div class="card card--mint" id="module3">
+            <div class="card-header">
+                <span class="badge badge-module3">③</span>
+                <h2>收益计算结果</h2>
+                <span class="hint">实时计算更新</span>
+            </div>
+            <div class="results-grid">
+                <div class="result-panel">
+                    <h3><span class="icon-dot dot-blue"></span>已启用订单明细</h3>
+                    <div style="overflow-x:auto;">
+                        <table class="result-table">
+                            <thead>
+                                <tr>
+                                    <th>订单</th>
+                                    <th>道具</th>
+                                    <th>数量</th>
+                                    <th>成本</th>
+                                    <th>残页</th>
+                                    <th>收入</th>
+                                    <th>净收益</th>
+                                </tr>
+                            </thead>
+                            <tbody id="detailTableBody">
+                                <tr><td colspan="7" style="text-align:center;color:var(--text-secondary);padding:20px;">暂无启用的订单</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="divider"></div>
+                    <table class="result-table">
+                        <tbody>
+                            <tr>
+                                <td>订单成本小计</td>
+                                <td style="text-align:right;font-weight:700;" id="subtotalCost">0</td>
+                            </tr>
+                            <tr>
+                                <td>订单收入小计（扣税）</td>
+                                <td style="text-align:right;font-weight:700;" id="subtotalIncome">0</td>
+                            </tr>
+                            <tr class="total-row">
+                                <td>订单净收益小计</td>
+                                <td style="text-align:right;" id="subtotalProfit">0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="result-panel highlight-panel">
+                    <h3><span class="icon-dot dot-mint"></span>累计奖励 & 总收益</h3>
+                    <div class="bonus-highlight" id="bonusBox">
+                        <div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:2px;">
+                            提交 <strong id="bonusCount">0</strong> 个订单档位
+                        </div>
+                        <div style="font-size:0.88rem;">🎁 普通宝箱奖励：<span class="bonus-amount" id="bonusPages">0</span> 个残页</div>
+                        <div style="font-size:0.8rem;color:var(--text-secondary);margin-top:2px;">
+                            折合实际收入：<strong id="bonusIncome">0</strong> 铜钱
+                        </div>
+                    </div>
+                    <div class="divider"></div>
+                    <table class="result-table">
+                        <tbody>
+                            <tr>
+                                <td>📜 订单残页总收入</td>
+                                <td style="text-align:right;" id="totalOrderIncome">0</td>
+                            </tr>
+                            <tr>
+                                <td>🎁 宝箱奖励收入</td>
+                                <td style="text-align:right;" id="totalBonusIncome">0</td>
+                            </tr>
+                            <tr>
+                                <td>📦 道具总成本</td>
+                                <td style="text-align:right;color:var(--danger);" id="totalCost">0</td>
+                            </tr>
+                            <tr class="total-row">
+                                <td>💰 <strong>总净收益</strong></td>
+                                <td style="text-align:right;" id="grandTotalProfit">0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div style="margin-top:12px;text-align:center;">
+                        <span class="tag tag-blue" id="verdictTag">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top:16px;display:flex;flex-wrap:wrap;gap:8px;font-size:0.78rem;color:var(--text-secondary);align-items:center;">
+                <span>📋 宝箱提交次数奖励（仅生效一次）：</span>
+                <span class="tag tag-blue">5次 → 18残页</span>
+                <span class="tag tag-blue">6次 → 22残页</span>
+                <span class="tag tag-blue">7次 → 28残页</span>
+                <span class="tag tag-green">8次 → 35残页</span>
+            </div>
+        </div>
+
+        </div><!-- /panel-freight -->
+
+        <!-- ===== 面板二：生活利润计算器 ===== -->
+        <div class="tab-panel" id="panel-craftsman" style="display:none;">
+            <div class="card card--blue">
+                <div class="card-header">
+                    <span class="badge badge-module1">⚒️</span>
+                    <h2>生活利润计算器</h2>
+                    <span class="hint">数据联动：工匠采集价格</span>
+                </div>
+
+                <div class="section-note">
+                    💡 物品与成本数据来自「工匠采集价格」；双倍概率一律以制作表中的设置为准，已扣除 <strong>5% 手续费</strong>。
+                    <button class="btn-sm" style="margin-left:8px;" onclick="switchTab('price')">⚒️ 去维护制作表</button>
+                </div>
+
+                <div class="highlight-box">
+                    <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;">
+                        <div style="flex:1;min-width:140px;">
+                            <label style="color:var(--primary-dark);font-weight:500;">💪 输入现有体力</label>
+                            <input type="number" id="craftStamina" class="highlight-input" value="1000" min="0" step="1">
+                        </div>
+                        <div style="flex-shrink:0;">
+                            <div class="fee-note" style="margin:0 0 4px;">&nbsp;</div>
+                            <button class="btn-sm primary" onclick="calcCraftsman()">🧮 重新计算</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="craftBestBox" class="bonus-highlight" style="background:linear-gradient(135deg,#ffffff,var(--soft-blue));">
+                    <div style="font-size:0.82rem;color:var(--text-secondary);">🏆 最佳制作方案</div>
+                    <div id="craftBestName" style="font-size:1.2rem;font-weight:700;color:var(--primary-dark);margin:2px 0;">—</div>
+                    <div id="craftBestStats" style="font-size:0.82rem;color:var(--text-secondary);">—</div>
+                </div>
+
+                <div style="margin-top:16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+                    <label style="margin:0;">📋 全物品利润排序（按单体力利润从高到低）</label>
+                    <button class="btn-sm" id="craftExpandBtn" onclick="toggleCraftExpand()">展开全部</button>
+                </div>
+                <div class="rank-list">
+                    <div class="rank-row head">
+                        <span>#</span><span>物品</span>
+                        <span class="r-right hide-m">材料成本</span>
+                        <span class="r-right hide-m">可制作</span>
+                        <span class="r-right">总利润</span>
+                        <span class="r-right">单体力净利</span>
+                    </div>
+                    <div id="craftRankBody">
+                        <div class="rank-row"><span style="grid-column:1/-1;text-align:center;color:var(--text-secondary);padding:16px;">暂无有效数据，请先在「货运道具价格表」填写成品售价</span></div>
+                    </div>
+                </div>
+
+                <div style="margin-top:14px;">
+                    <div class="formula-box">
+                        <b>计算公式（单体力净利润 · 采集 + 制造）</b><br>
+                        <b>🔵 采集方案</b>：单体力净利 = 产出数量 × 单价 × (1 + 双倍概率) ÷ 采集体力（采集动作本身不花钱）<br>
+                        <b>🟡 制造方案</b>（采集与制造独立，材料可在交易行购买）：<br>
+                        • 材料成本 = 全部材料价值（采集材料按采集表出售价计入，固定材料按固定价）<br>
+                        • 期望产出 = 基础产出 × (1 + 双倍概率，以制作表为准)<br>
+                        • 所需体力 = 制造体力（无需计入采集体力）<br>
+                        • 单体力净利润 = (期望产出 × 售价 − 材料成本) ÷ 制造体力（按此排序，★为最优）
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 面板三：货运道具价格表（全量维护，与首页同步） ===== -->
+        <div class="tab-panel" id="panel-prices" style="display:none;">
+            <div class="card card--blue">
+                <div class="card-header">
+                    <span class="badge badge-module1">📦</span>
+                    <h2>货运道具价格表</h2>
+                    <span class="hint">与货运计算器同步</span>
+                </div>
+                <div class="section-note">
+                    📌 本表维护全部道具成本价，修改后自动同步到首页「基础价格设置」。
+                    首页仅显示 8 个订单引用到的道具，新增/恢复默认请在本页操作。
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+                    <button class="btn-sm primary" onclick="addItemRow()">＋ 添加道具</button>
+                    <button class="btn-sm" onclick="resetDefaultItems()">🔄 恢复默认道具</button>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="price-table">
+                        <thead>
+                            <tr>
+                                <th style="width:45%;">道具名称</th>
+                                <th style="width:40%;">单价（铜钱）</th>
+                                <th style="width:15%;text-align:center;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fullPriceTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 面板四：工匠采集价格（合成配方 + 材料价格） ===== -->
+        <div class="tab-panel" id="panel-price" style="display:none;">
+            <div class="card card--mint">
+                <div class="card-header">
+                    <span class="badge badge-module3">⚒️</span>
+                    <h2>工匠采集价格</h2>
+                    <span class="hint"><span class="status-dot on"></span>价格云端共享 · 双倍概率仅本机</span>
+                </div>
+
+                <div class="section-note">
+                    📌 <b>合成配方表：</b>填写各成品所需材料与数量。成品的<b>售价自动同步「货运道具价格表」</b>，
+                    材料为<b>固定价格</b>的（如绸布、麻布等）只读引用下方数据库，其余材料单价可在此手动维护。
+                </div>
+
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+                    <button class="btn-sm" onclick="guildReset()">🔄 恢复默认配方</button>
+                    <button class="btn-sm" id="guildLogBtn" onclick="toggleGuildLog()">📝 修改记录</button>
+                </div>
+
+                <div id="guildTableWrap" class="guild-table-wrap">
+                    <table class="guild-table">
+                        <thead>
+                            <tr>
+                                <th style="width:90px;">成品</th>
+                                <th style="width:42px;">体力</th>
+                                <th style="width:42px;">产出</th>
+                                <th style="width:50px;">双倍%</th>
+                                <th style="width:155px;">材料①(名×数@价)</th>
+                                <th style="width:155px;">材料②(可空)</th>
+                                <th style="width:155px;">材料③(可空)</th>
+                                <th style="width:70px;">售价</th>
+                                <th style="width:76px;text-align:right;">成本</th>
+                                <th style="width:38px;text-align:center;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="guildTableBody"></tbody>
+                    </table>
+                    <div id="guildEmpty" style="display:none;text-align:center;color:var(--text-secondary);padding:22px;font-size:0.88rem;">暂无物品，点击「＋ 添加物品」开始维护配方</div>
+                </div>
+
+                <div id="guildLogWrap" style="display:none;">
+                    <div class="formula-box" style="margin-bottom:8px;">📝 修改记录（本地）：展示价格变动历史，便于追溯「谁在什么时候改了什么」。</div>
+                    <div class="log-list" id="guildLogList" style="background:#fff;border:1.5px solid var(--border-light);border-radius:var(--radius-sm);padding:6px 12px;"></div>
+                </div>
+
+                <!-- 固定材料价格（数据库） -->
+                <div style="margin-top:14px;">
+                    <div class="formula-box" style="background:var(--gold-bg);border-color:var(--gold-border);">
+                        <b>🔒 固定材料价格（数据库）</b><br>
+                        以下材料为固定收购价，自动同步到上方制作表；修改后保存到本地数据库（localStorage）。
+                        <div style="margin-top:8px;overflow-x:auto;">
+                            <table class="guild-table">
+                                <thead>
+                                    <tr>
+                                        <th>材料</th>
+                                        <th style="width:140px;">固定单价（铜钱）</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="fixedMatBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 材料采集表（数据库） -->
+                <div style="margin-top:14px;">
+                    <div class="formula-box" style="background:var(--success-bg);border-color:var(--success);">
+                        <b>🌿 材料采集表（数据库）</b><br>
+                        采集<b>无需成本</b>，仅消耗体力；单次产出可双倍（概率可编辑）。<b>填写「出售价」后即可参与「工匠利润计算器」的采集收益排名</b>。
+                        <div style="margin-top:8px;overflow-x:auto;">
+                            <table class="guild-table" style="min-width:520px;">
+                                <thead>
+                                    <tr>
+                                        <th style="width:26%;">材料</th>
+                                        <th style="width:17%;">体力/次</th>
+                                        <th style="width:17%;">产出/次</th>
+                                        <th style="width:20%;">双倍概率%</th>
+                                        <th style="width:20%;">出售价</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="gatherBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top:14px;">
+                    <div class="formula-box">
+                        <b>公式说明</b><br>
+                        • 材料成本（单件）= (材料①数量×单价 + 材料②数量×单价 + 材料③数量×单价) ÷ 产出数量<br>
+                        • 成品售价自动同步「货运道具价格表」，成交后扣除 5% 手续费（实际到手 95%）<br>
+                        • 采集「出售价」由高级会员上传至云端共享，全员每 30 秒自动拉取最新价格<br>
+                        • 双倍概率仅保存在本机，刷新页面后恢复默认值
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 面板五：拍卖计算器 ===== -->
+        <div class="tab-panel" id="panel-auction" style="display:none;">
+            <div class="card card--coral">
+                <div class="card-header">
+                    <span class="badge badge-module2">🎯</span>
+                    <h2>拍卖计算器</h2>
+                    <span class="hint">防止被卡 &amp; 收益核算</span>
+                </div>
+
+                <div class="highlight-box">
+                    <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;">
+                        <div style="flex:1;min-width:150px;">
+                            <label style="color:var(--primary-dark);font-weight:500;">💰 输入聚珍行价格</label>
+                            <input type="number" id="auctionStart" class="highlight-input" value="100000" min="0" step="1000">
+                        </div>
+                        <div style="flex-shrink:0;">
+                            <div class="ocr-radio-group" style="margin:0;">
+                                <label class="ocr-radio-label"><input type="radio" name="auctionMode" value="six" checked onchange="calcAuction()"> 6人拍卖</label>
+                                <label class="ocr-radio-label"><input type="radio" name="auctionMode" value="twelve" onchange="calcAuction()"> 12人拍卖</label>
+                            </div>
+                        </div>
+                        <div style="flex-shrink:0;">
+                            <div class="fee-note" style="margin:0 0 4px;">&nbsp;</div>
+                            <button class="btn-sm primary" onclick="calcAuction()">🧮 计算</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="auctionModeLabel" style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:10px;">—</div>
+                <div id="auctionResults"></div>
+
+                <div style="margin-top:12px;">
+                    <div class="highlight-box" style="margin:0;">
+                        <label style="color:var(--primary-dark);font-weight:500;">✍️ 输入你的实际拍卖价（自定义核算）</label>
+                        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                            <input type="number" id="auctionCustom" value="100000" min="0" style="max-width:200px;">
+                            <span id="auctionCustomResult" style="font-size:0.85rem;"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top:14px;">
+                    <div class="formula-box">
+                        <b>公式说明</b><br>
+                        • 个人赚取 = 起拍价 × 0.95 − 拍卖价<br>
+                        • 其他人收益 = 拍卖价 × 0.95 ÷ 5（6人） 或 ÷ 11（12人）<br>
+                        • 6人建议：最佳 = 起拍价 × 68% ｜ 合适 = 起拍价 × 72% ｜ 不亏 = 起拍价 × 79%<br>
+                        • 12人建议：卡价格但不过分 = 起拍价 × 83% ｜ 防止被卡不赚 = 起拍价 × 87%
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            逆水寒帮会货运收益计算工具 &nbsp;•&nbsp; Designed & Developed by <strong>Vasuki</strong>
+        </div>
+    </div>
+
+    <div class="ocr-overlay" id="ocrOverlay">
+        <div class="ocr-modal" id="ocrModal">
+            <div class="ocr-spinner" id="ocrSpinner"></div>
+            <div class="ocr-check">✅</div>
+            <div class="ocr-status" id="ocrStatus">77工作中…</div>
+            <button type="button" class="ocr-close-btn" id="ocrCloseBtn" onclick="closeOCRModal()">关闭</button>
+        </div>
+    </div>
+
+    <!-- 登录 / 注册弹窗 -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-modal">
+            <h3 id="authTitle">🔑 登录</h3>
+            <label>用户名</label>
+            <input type="text" id="authUsername" maxlength="20" placeholder="2-20 个字符">
+            <label>密码</label>
+            <input type="password" id="authPassword" maxlength="64" placeholder="至少 6 位">
+            <div class="auth-error" id="authError"></div>
+            <div class="auth-actions">
+                <button type="button" class="btn-sm" id="authSwitch" onclick="NSH.switchAuthMode()">没有账号？去注册</button>
+                <button type="button" class="btn-sm primary" onclick="NSH.submitAuth()">确定</button>
+                <button type="button" class="btn-sm" onclick="NSH.closeAuth()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 管理员弹窗 -->
+    <div class="auth-overlay" id="adminOverlay">
+        <div class="auth-modal admin-modal">
+            <h3>🛡️ 会员管理（管理员）</h3>
+            <div class="admin-tabs">
+                <button type="button" class="btn-sm active" id="adminTabMembers" onclick="NSH.showAdminTab('members')">会员列表</button>
+                <button type="button" class="btn-sm" id="adminTabLogs" onclick="NSH.showAdminTab('logs')">改价日志</button>
+            </div>
+            <div class="admin-list" id="adminMembers"></div>
+            <div class="admin-list" id="adminLogs" style="display:none;"></div>
+            <div style="text-align:center;margin-top:14px;">
+                <button type="button" class="btn-sm" onclick="document.getElementById('adminOverlay').style.display='none'">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            let items = [
+                { id: 'item_1', name: '如燕追风匣', price: 2760 },
+                { id: 'item_2', name: '惊鹊追风匣', price: 4110 },
+                { id: 'item_3', name: '归鸿追风匣', price: 4880 },
+                { id: 'item_4', name: '普通资源箱', price: 5550 },
+                { id: 'item_5', name: '兰溪解玉砂', price: 3388 },
+                { id: 'item_6', name: '清河解玉砂', price: 16222 },
+                { id: 'item_7', name: '装备鉴定书·60', price: 11000 },
+                { id: 'item_8', name: '百炼武器鉴定书', price: 51661 },
+                { id: 'item_9', name: '百炼头盔鉴定书', price: 51000 },
+                { id: 'item_10', name: '百炼戒指鉴定书', price: 56460 },
+                { id: 'item_11', name: '百炼上衣鉴定书', price: 66466 },
+                { id: 'item_12', name: '百炼耳饰鉴定书', price: 69900 },
+                { id: 'item_13', name: '百炼手镯鉴定书', price: 71344 },
+                { id: 'item_14', name: '百炼手套鉴定书', price: 59886 },
+                { id: 'item_15', name: '百炼腰带鉴定书', price: 76777 },
+                { id: 'item_16', name: '百炼项链鉴定书', price: 0 },
+                { id: 'item_17', name: '百炼鞋子鉴定书', price: 0 },
+                { id: 'item_18', name: '灵纹锥', price: 24200 },
+                { id: 'item_19', name: '神铸符石', price: 74980 },
+                { id: 'item_20', name: '六合生脉散', price: 628 },
+                { id: 'item_21', name: '六合雪魄丹', price: 163 },
+                { id: 'item_22', name: '中品珠玑羹', price: 4130 },
+                { id: 'item_23', name: '中品玲珑羹', price: 4169 },
+                { id: 'item_24', name: '中品碎金饭', price: 4145 },
+                { id: 'item_25', name: '中品金玉饭', price: 4386 },
+                { id: 'item_26', name: '中品白斩鸡', price: 4350 },
+                { id: 'item_27', name: '中品肉末豆腐', price: 4317 },
+                { id: 'item_28', name: '中品麻婆豆腐', price: 4320 },
+                { id: 'item_29', name: '中品松鼠鲤鱼', price: 4450 },
+                { id: 'item_30', name: '中品灯影牛肉', price: 4400 },
+                { id: 'item_31', name: '中品红焖羊肉', price: 4435 },
+                { id: 'item_32', name: '中品东坡肘子', price: 4290 },
+                { id: 'item_33', name: '五福百草丹', price: 54 },
+                { id: 'item_34', name: '五福回生散', price: 211 },
+                { id: 'item_35', name: '下品碎金饭', price: 1342 },
+                { id: 'item_36', name: '下品金玉饭', price: 1320 },
+                { id: 'item_37', name: '下品玲珑羹', price: 1297 },
+                { id: 'item_38', name: '下品珠玑羹', price: 1300 },
+                { id: 'item_39', name: '下品灯影牛肉', price: 1312 },
+                { id: 'item_40', name: '下品白斩鸡', price: 1350 },
+                { id: 'item_41', name: '下品肉末豆腐', price: 1335 },
+                { id: 'item_42', name: '下品麻婆豆腐', price: 1350 },
+                { id: 'item_43', name: '下品东坡肘子', price: 1349 },
+                { id: 'item_44', name: '下品松鼠鲤鱼', price: 1327 },
+                { id: 'item_45', name: '下品红焖羊肉', price: 1350 },
+            ];
+            let itemIdCounter = 100;
+
+            let orders = [];
+            for (let i = 0; i < 8; i++) {
+                orders.push({
+                    id: i,
+                    itemName: items[i % items.length].name,
+                    quantity: (i + 1) * 2,
+                    rewardPages: 3 + i * 2,
+                    enabled: true,
+                });
+            }
+
+            const bonusRules = { 5: 18, 6: 22, 7: 28, 8: 35 };
+
+            const treasureMapPriceInput = document.getElementById('treasureMapPrice');
+            const priceTableBody = document.getElementById('priceTableBody');
+            const orderList = document.getElementById('orderList');
+            const activeOrderCountEl = document.getElementById('activeOrderCount');
+            const bonusTierDisplayEl = document.getElementById('bonusTierDisplay');
+            const detailTableBody = document.getElementById('detailTableBody');
+            const subtotalCostEl = document.getElementById('subtotalCost');
+            const subtotalIncomeEl = document.getElementById('subtotalIncome');
+            const subtotalProfitEl = document.getElementById('subtotalProfit');
+            const bonusCountEl = document.getElementById('bonusCount');
+            const bonusPagesEl = document.getElementById('bonusPages');
+            const bonusIncomeEl = document.getElementById('bonusIncome');
+            const totalOrderIncomeEl = document.getElementById('totalOrderIncome');
+            const totalBonusIncomeEl = document.getElementById('totalBonusIncome');
+            const totalCostEl = document.getElementById('totalCost');
+            const grandTotalProfitEl = document.getElementById('grandTotalProfit');
+            const verdictTag = document.getElementById('verdictTag');
+            const bonusBox = document.getElementById('bonusBox');
+            const fullPriceTableBody = document.getElementById('fullPriceTableBody');
+
+            function formatNumber(num) {
+                if (num === null || num === undefined || isNaN(num)) return '0';
+                return Math.round(num).toLocaleString('zh-CN');
+            }
+            function getItemPrice(itemName) {
+                const item = items.find(it => it.name === itemName);
+                return item ? item.price : 0;
+            }
+            function getTreasureMapPrice() {
+                const val = parseFloat(treasureMapPriceInput.value);
+                return isNaN(val) || val < 0 ? 0 : val;
+            }
+            function escapeHtml(str) {
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
+            function normalizeOCRItemName(name){
+                if(!name) return "";
+                const map = {
+                    "如燕追风匣":["知燕道风匣","知燕追风匣","如燕道风匣","如燕追风","如燕追风匣"],
+                    "惊鹊追风匣":["惊鹊道风匣","惊鹤道风匣","惊鹊追风","惊鹊追风匣"],
+                    "归鸿追风匣":["归鸿道风匣","归鸿追风","归鸿追风匣"],
+                    "普通资源箱":["普通资源箱","普通资源"],
+                    "兰溪解玉砂":["兰溪·解玉砂","兰溪 解玉砂","兰溪解玉砂","兰溪解玉"],
+                    "清河解玉砂":["清河·解玉砂","清河 解玉砂","清河解玉砂","清河解玉"],
+                    "装备鉴定书·60":["装备鉴定书·60","装备鉴定书60","装备鉴定书","装备鉴定·60","装备监定书"],
+                    "百炼武器鉴定书":["百炼武器鉴定书","百炼武器鉴定"],
+                    "百炼头盔鉴定书":["百炼头盔鉴定书","百炼头盔鉴定","百炼头盔"],
+                    "百炼戒指鉴定书":["百炼戒指鉴定书","百炼戒指鉴定","百炼戒指"],
+                    "百炼上衣鉴定书":["百炼上衣鉴定书","百炼上衣鉴定","百炼上衣"],
+                    "百炼耳饰鉴定书":["百炼耳饰鉴定书","百炼耳饰鉴定","百炼耳饰","百炼耳环鉴定书"],
+                    "百炼手镯鉴定书":["百炼手镯鉴定书","百炼手镯鉴定","百炼手镯"],
+                    "百炼手套鉴定书":["百炼手套鉴定书","百炼手套鉴定","百炼手套"],
+                    "百炼腰带鉴定书":["百炼腰带鉴定书","百炼腰带鉴定","百炼腰带"],
+                    "百炼项链鉴定书":["百炼项链鉴定书","百炼项链鉴定","百炼项链"],
+                    "百炼鞋子鉴定书":["百炼鞋子鉴定书","百炼鞋子鉴定","百炼鞋子","百炼靴子鉴定书"],
+                    "灵纹锥":["灵纹锥"],
+                    "神铸符石":["神铸符石","神铸符"],
+                    "六合生脉散":["六合生脉散","六合生脉"],
+                    "六合雪魄丹":["六合雪魄丹","六合雪魄"],
+                    "中品珠玑羹":["中品珠玑羹","中品珠玑"],
+                    "中品玲珑羹":["中品玲珑羹","中品玲珑"],
+                    "中品碎金饭":["中品碎金饭","中品碎金"],
+                    "中品金玉饭":["中品金玉饭","中品金玉"],
+                    "中品白斩鸡":["中品白斩鸡","中品白切鸡"],
+                    "中品肉末豆腐":["中品肉末豆腐","中品肉沫豆腐"],
+                    "中品麻婆豆腐":["中品麻婆豆腐"],
+                    "中品松鼠鲤鱼":["中品松鼠鲤鱼","中品松鼠桂鱼"],
+                    "中品灯影牛肉":["中品灯影牛肉"],
+                    "中品红焖羊肉":["中品红焖羊肉","中品红焖羊"],
+                    "中品东坡肘子":["中品东坡肘子","中品东坡肉"],
+                    "五福百草丹":["五福百草丹","五福百草"],
+                    "五福回生散":["五福回生散","五福回生"],
+                    "下品碎金饭":["下品碎金饭","下品碎金"],
+                    "下品金玉饭":["下品金玉饭","下品金玉"],
+                    "下品玲珑羹":["下品玲珑羹","下品玲珑"],
+                    "下品珠玑羹":["下品珠玑羹","下品珠玑"],
+                    "下品灯影牛肉":["下品灯影牛肉"],
+                    "下品白斩鸡":["下品白斩鸡","下品白切鸡"],
+                    "下品肉末豆腐":["下品肉末豆腐","下品肉沫豆腐"],
+                    "下品麻婆豆腐":["下品麻婆豆腐"],
+                    "下品东坡肘子":["下品东坡肘子","下品东坡肉"],
+                    "下品松鼠鲤鱼":["下品松鼠鲤鱼","下品松鼠桂鱼"],
+                    "下品红焖羊肉":["下品红焖羊肉","下品红焖羊"]
+                };
+                for(const standard in map){
+                    for(const alias of map[standard]){
+                        if(name.includes(alias)) return standard;
+                    }
+                }
+                return name;
+            }
+            function parseOCRQuantity(str) {
+                if (!str) return 0;
+                let clean = str.trim();
+                if (clean.includes('/')) {
+                    const parts = clean.split('/');
+                    const numMatch = parts[parts.length - 1].match(/\d+/);
+                    if (numMatch) return parseInt(numMatch[0], 10);
+                }
+                clean = clean.replace(/装备[监鉴]定书·?\d*/, '');
+                const numMatch = clean.match(/\d+/);
+                if (numMatch) return parseInt(numMatch[0], 10);
+                return 0;
+            }
+            function parseOCRReward(str) {
+                if (!str) return 0;
+                const match = str.match(/(\d+)\s*(?:宝图|残片)?/);
+                return match ? parseInt(match[1], 10) : 0;
+            }
+            function parseQQOCR(text) {
+                const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+                const filtered = lines.filter(l => !/^(提交可得|获取|提交)[:：]?$/i.test(l));
+                const result = [];
+                if (filtered.length >= 24) {
+                    const names1 = filtered.slice(0, 4);
+                    const qtys1 = filtered.slice(4, 8);
+                    const rewards1 = filtered.slice(8, 12);
+                    const names2 = filtered.slice(12, 16);
+                    const qtys2 = filtered.slice(16, 20);
+                    const rewards2 = filtered.slice(20, 24);
+                    for (let i = 0; i < 4; i++) {
+                        result.push({
+                            itemName: normalizeOCRItemName(names1[i]),
+                            quantity: parseOCRQuantity(qtys1[i]),
+                            rewardPages: parseOCRReward(rewards1[i])
+                        });
+                    }
+                    for (let i = 0; i < 4; i++) {
+                        result.push({
+                            itemName: normalizeOCRItemName(names2[i]),
+                            quantity: parseOCRQuantity(qtys2[i]),
+                            rewardPages: parseOCRReward(rewards2[i])
+                        });
+                    }
+                } else {
+                    alert('QQ OCR 文本行数不足，请确保完整复制了所有 8 个订单识别内容！');
+                }
+                return result;
+            }
+            function parseWeChatOCR(text) {
+                const blocks = text.split(/提交可得[:：]?/i);
+                const result = [];
+                if (blocks.length >= 8) {
+                    for (let i = 0; i < 8; i++) {
+                        const currentBlockLines = blocks[i].split('\n').map(l => l.trim()).filter(l => l.length > 0);
+                        const nameQtyLines = currentBlockLines.filter(l => !/(宝图|残片|获取|提交)/.test(l));
+                        let combinedNameQty = nameQtyLines.join(' ');
+                        let name = normalizeOCRItemName(combinedNameQty);
+                        let qty = parseOCRQuantity(combinedNameQty);
+                        const nextBlockLines = blocks[i + 1].split('\n').map(l => l.trim()).filter(l => l.length > 0);
+                        let rewardLine = nextBlockLines.find(l => /(宝图|残片|\d+)/.test(l)) || nextBlockLines[0] || '';
+                        let reward = parseOCRReward(rewardLine);
+                        result.push({ itemName: name, quantity: qty, rewardPages: reward });
+                    }
+                } else {
+                    alert('微信 OCR 文本格式未能成功匹配，请确保复制了完整的 8 项货运订单信息！');
+                }
+                return result;
+            }
+            // 确保识别到的道具存在于货运价格表数据中（不存在则自动追加）
+            function ensureItemExists(name) {
+                if (!name) return;
+                if (items.some(it => it.name === name)) return;
+                items.push({ id: 'item_' + (++itemIdCounter), name: name, price: 0 });
+            }
+            function parseAndFillOCR() {
+                const rawText = document.getElementById('ocrInput').value;
+                if (!rawText.trim()) { alert('请先粘贴 OCR 识别出的文本！'); return; }
+                const ocrType = document.querySelector('input[name="ocrSource"]:checked').value;
+                let parsedOrders = [];
+                if (ocrType === 'qq') parsedOrders = parseQQOCR(rawText);
+                else parsedOrders = parseWeChatOCR(rawText);
+                if (parsedOrders && parsedOrders.length > 0) {
+                    parsedOrders.forEach((item, index) => {
+                        if (index < orders.length) {
+                            orders[index].itemName = item.itemName;
+                            orders[index].quantity = item.quantity;
+                            orders[index].rewardPages = item.rewardPages;
+                            orders[index].enabled = true;
+                            ensureItemExists(item.itemName);
+                        }
+                    });
+                    renderPriceTableDOM();
+                    renderFullPriceTableDOM();
+                    renderOrderListDOM();
+                    updateResults();
+                    const notice = document.getElementById('ocrNotice');
+                    notice.style.display = 'block';
+                    notice.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }
+
+            function buildPriceRowHTML(item, onlyOne) {
+                return `
+                        <td>
+                            <input type="text" class="item-name-input" value="${escapeHtml(item.name)}"
+                                data-item-id="${item.id}" data-field="name" placeholder="道具名称">
+                        </td>
+                        <td>
+                            <input type="number" value="${item.price}" min="0" step="1"
+                                data-item-id="${item.id}" data-field="price" placeholder="单价" style="text-align:right;">
+                        </td>
+                        <td style="text-align:center;">
+                            <button class="btn-icon" title="删除道具" data-action="delete" data-item-id="${item.id}"
+                                ${onlyOne ? 'disabled style="opacity:0.3;cursor:not-allowed;"' : ''}>✕</button>
+                        </td>`;
+            }
+            function bindPriceTableEvents(tableBody) {
+                tableBody.querySelectorAll('input').forEach(input => input.addEventListener('input', handlePriceInput));
+                tableBody.querySelectorAll('button[data-action="delete"]').forEach(btn => btn.addEventListener('click', handleDeleteItem));
+            }
+            // 首页：仅渲染订单引用到的道具（识别到的道具）
+            function renderPriceTableDOM() {
+                const usedNames = new Set(orders.map(o => o.itemName));
+                const filtered = items.filter(it => usedNames.has(it.name));
+                priceTableBody.innerHTML = '';
+                filtered.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.setAttribute('data-item-id', item.id);
+                    tr.innerHTML = buildPriceRowHTML(item, filtered.length <= 1);
+                    priceTableBody.appendChild(tr);
+                });
+                bindPriceTableEvents(priceTableBody);
+            }
+            // 全量价格表：渲染所有道具（「货运道具价格表」标签页）
+            function renderFullPriceTableDOM() {
+                fullPriceTableBody.innerHTML = '';
+                items.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.setAttribute('data-item-id', item.id);
+                    tr.innerHTML = buildPriceRowHTML(item, items.length <= 1);
+                    fullPriceTableBody.appendChild(tr);
+                });
+                bindPriceTableEvents(fullPriceTableBody);
+            }
+            function renderOrderListDOM() {
+                orderList.innerHTML = '';
+                orders.forEach((order, index) => {
+                    const div = document.createElement('div');
+                    div.className = `order-row${order.enabled ? ' active-order' : ''}`;
+                    div.setAttribute('data-order-id', order.id);
+                    div.innerHTML = `
+                        <span class="order-num">#${index + 1}</span>
+                        <select data-field="itemName" data-order-id="${order.id}">
+                            ${items.map(it => `
+                                <option value="${escapeHtml(it.name)}" ${it.name === order.itemName ? 'selected' : ''}>
+                                    ${escapeHtml(it.name)} (${formatNumber(it.price)})
+                                </option>
+                            `).join('')}
+                        </select>
+                        <span class="inline-label">需</span>
+                        <input type="number" class="qty-input" value="${order.quantity}" min="0" step="1"
+                            data-field="quantity" data-order-id="${order.id}">
+                        <span class="inline-label">个</span>
+                        <span class="inline-label">得残页</span>
+                        <input type="number" class="reward-input" value="${order.rewardPages}" min="0" step="1"
+                            data-field="rewardPages" data-order-id="${order.id}">
+                        <span class="inline-label">个</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" data-field="enabled" data-order-id="${order.id}" ${order.enabled ? 'checked' : ''}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="order-summary-mini"><span class="profit-positive">+0</span></span>
+                    `;
+                    orderList.appendChild(div);
+                });
+                orderList.querySelectorAll('select, input').forEach(el => {
+                    const evt = (el.tagName === 'INPUT' && el.type === 'number') ? 'input' : 'change';
+                    el.addEventListener(evt, handleOrderInput);
+                });
+            }
+            function updateSelectOptionsText() {
+                const selects = orderList.querySelectorAll('select[data-field="itemName"]');
+                selects.forEach(select => {
+                    const currentVal = select.value;
+                    Array.from(select.options).forEach(opt => {
+                        const it = items.find(i => i.name === opt.value);
+                        if (it) opt.textContent = `${it.name} (${formatNumber(it.price)})`;
+                    });
+                    select.value = currentVal;
+                });
+            }
+            function handlePriceInput(e) {
+                const input = e.target;
+                const itemId = input.getAttribute('data-item-id');
+                const field = input.getAttribute('data-field');
+                const item = items.find(it => it.id === itemId);
+                if (!item) return;
+                if (field === 'price') {
+                    const val = parseFloat(input.value);
+                    item.price = isNaN(val) || val < 0 ? 0 : val;
+                    // 同步另一张价格表中的同一道具价格（不重绘，避免焦点丢失）
+                    document.querySelectorAll(`input[data-item-id="${itemId}"][data-field="price"]`).forEach(inp => {
+                        if (inp !== input) inp.value = item.price;
+                    });
+                    updateSelectOptionsText();
+                    orders.forEach(o => updateSingleOrderDisplay(o.id));
+                    updateResults();
+                    // 联动「工匠采集价格」售价列与工匠计算
+                    if (window.refreshGuildSales) window.refreshGuildSales();
+                    // 记录待同步价格（会员云端同步用）
+                    if (window.__registerPendingFreight) window.__registerPendingFreight(item.name, item.price);
+                } else if (field === 'name') {
+                    const oldName = item.name;
+                    const newName = input.value.trim();
+                    if (newName) {
+                        item.name = newName;
+                        document.querySelectorAll(`input[data-item-id="${itemId}"][data-field="name"]`).forEach(inp => {
+                            if (inp !== input) inp.value = item.name;
+                        });
+                        orders.forEach(o => { if (o.itemName === oldName) o.itemName = newName; });
+                        updateSelectOptionsText();
+                        updateResults();
+                        // 待同步记录随道具改名迁移
+                        if (window.__renamePendingFreight) window.__renamePendingFreight(oldName, newName);
+                    }
+                }
+            }
+            function handleDeleteItem(e) {
+                const btn = e.target.closest('button');
+                if (!btn) return;
+                const itemId = btn.getAttribute('data-item-id');
+                if (items.length <= 1) return;
+                const deleted = items.find(it => it.id === itemId);
+                items = items.filter(it => it.id !== itemId);
+                orders.forEach(o => { if (o.itemName === deleted.name) o.itemName = items[0].name; });
+                if (window.__removePendingFreight) window.__removePendingFreight(deleted.name);
+                renderPriceTableDOM();
+                renderFullPriceTableDOM();
+                renderOrderListDOM();
+                updateResults();
+                if (window.refreshGuildSales) window.refreshGuildSales();
+            }
+            function handleOrderInput(e) {
+                const el = e.target;
+                const orderId = parseInt(el.getAttribute('data-order-id'));
+                const field = el.getAttribute('data-field');
+                const order = orders.find(o => o.id === orderId);
+                if (!order) return;
+                if (field === 'itemName') {
+                    order.itemName = el.value;
+                    // 订单道具变化 → 首页价格表引用集合变化，需要重绘
+                    renderPriceTableDOM();
+                } else if (field === 'quantity') {
+                    const val = parseInt(el.value);
+                    order.quantity = isNaN(val) || val < 0 ? 0 : val;
+                } else if (field === 'rewardPages') {
+                    const val = parseInt(el.value);
+                    order.rewardPages = isNaN(val) || val < 0 ? 0 : val;
+                } else if (field === 'enabled') order.enabled = el.checked;
+                updateSingleOrderDisplay(orderId);
+                updateResults();
+            }
+            function updateSingleOrderDisplay(orderId) {
+                const order = orders.find(o => o.id === orderId);
+                if (!order) return;
+                const row = orderList.querySelector(`[data-order-id="${orderId}"]`);
+                if (!row) return;
+                const itemPrice = getItemPrice(order.itemName);
+                const mapPrice = getTreasureMapPrice();
+                const cost = order.quantity * itemPrice;
+                const income = order.rewardPages * mapPrice * 0.95;
+                const profit = income - cost;
+                const miniSpan = row.querySelector('.order-summary-mini span');
+                if (miniSpan) {
+                    miniSpan.className = profit >= 0 ? 'profit-positive' : 'profit-negative';
+                    miniSpan.textContent = `${profit >= 0 ? '+' : ''}${formatNumber(profit)}`;
+                }
+                if (order.enabled) row.classList.add('active-order');
+                else row.classList.remove('active-order');
+            }
+            function toggleAllOrders(enable) {
+                orders.forEach(o => o.enabled = enable);
+                renderOrderListDOM();
+                updateResults();
+            }
+            function enableTopOrders() {
+                const mapPrice = getTreasureMapPrice();
+                const scored = orders.map(o => {
+                    const cost = o.quantity * getItemPrice(o.itemName);
+                    const income = o.rewardPages * mapPrice * 0.95;
+                    return { id: o.id, profit: income - cost };
+                });
+                scored.sort((a, b) => b.profit - a.profit);
+                const top5Ids = scored.slice(0, 5).map(o => o.id);
+                orders.forEach(o => o.enabled = top5Ids.includes(o.id));
+                renderOrderListDOM();
+                updateResults();
+            }
+            function updateResults() {
+                const mapPrice = getTreasureMapPrice();
+                const enabledOrders = orders.filter(o => o.enabled);
+                const activeCount = enabledOrders.length;
+                activeOrderCountEl.textContent = activeCount;
+                if (activeCount >= 5) {
+                    bonusTierDisplayEl.textContent = `提交${activeCount}次 → 奖励 ${bonusRules[activeCount] || 0} 残页`;
+                    bonusTierDisplayEl.style.color = '#4a90c2';
+                } else {
+                    bonusTierDisplayEl.textContent = activeCount > 0 ? '未达5次，无宝箱' : '—';
+                    bonusTierDisplayEl.style.color = 'var(--text-secondary)';
+                }
+                let totalCost = 0;
+                let totalOrderIncomeNet = 0;
+                const detailRows = [];
+                enabledOrders.forEach(order => {
+                    const itemPrice = getItemPrice(order.itemName);
+                    const cost = order.quantity * itemPrice;
+                    const netIncome = order.rewardPages * mapPrice * 0.95;
+                    const profit = netIncome - cost;
+                    totalCost += cost;
+                    totalOrderIncomeNet += netIncome;
+                    detailRows.push({
+                        orderNum: orders.findIndex(o => o.id === order.id) + 1,
+                        itemName: order.itemName,
+                        quantity: order.quantity,
+                        cost: cost,
+                        rewardPages: order.rewardPages,
+                        income: netIncome,
+                        profit: profit
+                    });
+                });
+                let bonusPages = (activeCount >= 5 && bonusRules[activeCount]) ? bonusRules[activeCount] : 0;
+                const bonusIncomeNet = bonusPages * mapPrice * 0.95;
+                const grandTotalProfit = totalOrderIncomeNet + bonusIncomeNet - totalCost;
+
+                if (detailRows.length === 0) {
+                    detailTableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-secondary);padding:20px;">暂无启用的订单</td></tr>';
+                } else {
+                    detailTableBody.innerHTML = detailRows.map(row => `
+                        <tr>
+                            <td>#${row.orderNum}</td>
+                            <td>${escapeHtml(row.itemName)}</td>
+                            <td>${formatNumber(row.quantity)}</td>
+                            <td style="color:var(--danger);">${formatNumber(row.cost)}</td>
+                            <td>${formatNumber(row.rewardPages)}</td>
+                            <td>${formatNumber(row.income)}</td>
+                            <td class="${row.profit >= 0 ? 'profit-positive' : 'profit-negative'}">
+                                ${row.profit >= 0 ? '+' : ''}${formatNumber(row.profit)}
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+                subtotalCostEl.textContent = formatNumber(totalCost) + ' 铜';
+                subtotalIncomeEl.textContent = formatNumber(totalOrderIncomeNet) + ' 铜';
+                const subProfit = totalOrderIncomeNet - totalCost;
+                subtotalProfitEl.textContent = (subProfit >= 0 ? '+' : '') + formatNumber(subProfit) + ' 铜';
+                subtotalProfitEl.className = subProfit >= 0 ? 'profit-positive' : 'profit-negative';
+                bonusCountEl.textContent = activeCount;
+                bonusPagesEl.textContent = formatNumber(bonusPages);
+                bonusIncomeEl.textContent = formatNumber(bonusIncomeNet) + ' 铜';
+                bonusBox.style.opacity = bonusPages > 0 ? '1' : '0.6';
+                totalOrderIncomeEl.textContent = formatNumber(totalOrderIncomeNet) + ' 铜';
+                totalBonusIncomeEl.textContent = formatNumber(bonusIncomeNet) + ' 铜';
+                totalCostEl.textContent = formatNumber(totalCost) + ' 铜';
+                grandTotalProfitEl.textContent = (grandTotalProfit >= 0 ? '+' : '') + formatNumber(grandTotalProfit) + ' 铜';
+                grandTotalProfitEl.className = (grandTotalProfit >= 0 ? 'profit-positive' : 'profit-negative') + ' big-number';
+                if (activeCount === 0) { verdictTag.textContent = '未开启订单'; verdictTag.className = 'tag tag-blue'; }
+                else if (grandTotalProfit > 0) { verdictTag.textContent = '✅ 收益丰厚，推荐提交'; verdictTag.className = 'tag tag-green'; }
+                else if (grandTotalProfit === 0) { verdictTag.textContent = '⚖️ 保本微利'; verdictTag.className = 'tag tag-gold'; }
+                else { verdictTag.textContent = '⚠️ 当前方案亏损，建议调整订单'; verdictTag.className = 'tag tag-red'; }
+                orders.forEach(o => updateSingleOrderDisplay(o.id));
+            }
+            function addItemRow() {
+                const newItem = { id: 'item_' + (++itemIdCounter), name: '新道具' + (items.length + 1), price: 0 };
+                items.push(newItem);
+                renderPriceTableDOM();
+                renderFullPriceTableDOM();
+                renderOrderListDOM();
+                updateResults();
+                const newInp = fullPriceTableBody.querySelector(`input[data-item-id="${newItem.id}"][data-field="name"]`);
+                if (newInp) { newInp.focus(); newInp.select(); }
+                if (window.refreshGuildSales) window.refreshGuildSales();
+            }
+            function resetDefaultItems() {
+                items = [
+                    { id: 'item_1', name: '如燕追风匣', price: 2760 },
+                    { id: 'item_2', name: '惊鹊追风匣', price: 4110 },
+                    { id: 'item_3', name: '归鸿追风匣', price: 4880 },
+                    { id: 'item_4', name: '普通资源箱', price: 5550 },
+                    { id: 'item_5', name: '兰溪解玉砂', price: 3388 },
+                    { id: 'item_6', name: '清河解玉砂', price: 16222 },
+                    { id: 'item_7', name: '装备鉴定书·60', price: 11000 },
+                    { id: 'item_8', name: '百炼武器鉴定书', price: 51661 },
+                    { id: 'item_9', name: '百炼头盔鉴定书', price: 51000 },
+                    { id: 'item_10', name: '百炼戒指鉴定书', price: 56460 },
+                    { id: 'item_11', name: '百炼上衣鉴定书', price: 66466 },
+                    { id: 'item_12', name: '百炼耳饰鉴定书', price: 69900 },
+                    { id: 'item_13', name: '百炼手镯鉴定书', price: 71344 },
+                    { id: 'item_14', name: '百炼手套鉴定书', price: 59886 },
+                    { id: 'item_15', name: '百炼腰带鉴定书', price: 76777 },
+                    { id: 'item_16', name: '百炼项链鉴定书', price: 0 },
+                    { id: 'item_17', name: '百炼鞋子鉴定书', price: 0 },
+                    { id: 'item_18', name: '灵纹锥', price: 24200 },
+                    { id: 'item_19', name: '神铸符石', price: 74980 },
+                    { id: 'item_20', name: '六合生脉散', price: 628 },
+                    { id: 'item_21', name: '六合雪魄丹', price: 163 },
+                    { id: 'item_22', name: '中品珠玑羹', price: 4130 },
+                    { id: 'item_23', name: '中品玲珑羹', price: 4169 },
+                    { id: 'item_24', name: '中品碎金饭', price: 4145 },
+                    { id: 'item_25', name: '中品金玉饭', price: 4386 },
+                    { id: 'item_26', name: '中品白斩鸡', price: 4350 },
+                    { id: 'item_27', name: '中品肉末豆腐', price: 4317 },
+                    { id: 'item_28', name: '中品麻婆豆腐', price: 4320 },
+                    { id: 'item_29', name: '中品松鼠鲤鱼', price: 4450 },
+                    { id: 'item_30', name: '中品灯影牛肉', price: 4400 },
+                    { id: 'item_31', name: '中品红焖羊肉', price: 4435 },
+                    { id: 'item_32', name: '中品东坡肘子', price: 4290 },
+                    { id: 'item_33', name: '五福百草丹', price: 54 },
+                    { id: 'item_34', name: '五福回生散', price: 211 },
+                    { id: 'item_35', name: '下品碎金饭', price: 1342 },
+                    { id: 'item_36', name: '下品金玉饭', price: 1320 },
+                    { id: 'item_37', name: '下品玲珑羹', price: 1297 },
+                    { id: 'item_38', name: '下品珠玑羹', price: 1300 },
+                    { id: 'item_39', name: '下品灯影牛肉', price: 1312 },
+                    { id: 'item_40', name: '下品白斩鸡', price: 1350 },
+                    { id: 'item_41', name: '下品肉末豆腐', price: 1335 },
+                    { id: 'item_42', name: '下品麻婆豆腐', price: 1350 },
+                    { id: 'item_43', name: '下品东坡肘子', price: 1349 },
+                    { id: 'item_44', name: '下品松鼠鲤鱼', price: 1327 },
+                    { id: 'item_45', name: '下品红焖羊肉', price: 1350 },
+                ];
+                orders.forEach((o, i) => o.itemName = items[i % items.length].name);
+                treasureMapPriceInput.value = 12000;
+                if (window.__clearPendingFreight) window.__clearPendingFreight();
+                renderPriceTableDOM();
+                renderFullPriceTableDOM();
+                renderOrderListDOM();
+                updateResults();
+                if (window.refreshGuildSales) window.refreshGuildSales();
+            }
+
+            let aiOCRImageBase64 = null;
+            function loadAIImage(file){
+                if(!file || !file.type.startsWith("image/")) return;
+                const reader = new FileReader();
+                reader.onload = function(e){
+                    aiOCRImageBase64 = e.target.result;
+                    const preview = document.getElementById("ocrPreview");
+                    preview.src = aiOCRImageBase64;
+                    preview.style.display = "block";
+                };
+                reader.readAsDataURL(file);
+            }
+            const ocrImageInput = document.getElementById("ocrImageInput");
+            if(ocrImageInput) ocrImageInput.addEventListener("change", function(e){ loadAIImage(e.target.files[0]); });
+            document.addEventListener("paste",function(e){
+                const items = e.clipboardData?.items || [];
+                for(const item of items){
+                    if(item.type.includes("image")){ loadAIImage(item.getAsFile()); break; }
+                }
+            });
+
+            let isRecognizing = false;
+            function showOCRModal(){
+                const modal = document.getElementById('ocrModal');
+                const status = document.getElementById('ocrStatus');
+                modal.classList.remove('done', 'error');
+                status.textContent = '77工作中…';
+                document.getElementById('ocrOverlay').classList.add('show');
+            }
+            function finishOCRModal(success, statusText){
+                const modal = document.getElementById('ocrModal');
+                const status = document.getElementById('ocrStatus');
+                modal.classList.add('done');
+                modal.classList.toggle('error', !success);
+                status.textContent = statusText || (success ? '77工作完成' : '77工作失败');
+            }
+            window.closeOCRModal = function(){ document.getElementById('ocrOverlay').classList.remove('show'); };
+            window.aiOCRRecognize = async function(){
+                if(isRecognizing) return;
+                if(!aiOCRImageBase64){ alert("请上传截图或Ctrl+V粘贴截图"); return; }
+                isRecognizing = true;
+                const ocrBtn = document.querySelector('button[onclick="aiOCRRecognize()"]');
+                if(ocrBtn) ocrBtn.disabled = true;
+                showOCRModal();
+                const workerURL = "https://nsh-ocr-proxy.sinpne5.workers.dev";
+                try {
+                    const response = await fetch(workerURL, {
+                        method:"POST",
+                        headers:{ "Content-Type":"application/json" },
+                        body:JSON.stringify({ image:aiOCRImageBase64 })
+                    });
+                    const data = await response.json();
+                    if(!response.ok){
+                        finishOCRModal(false, "77工作失败");
+                        alert("AI 识别失败：" + (data.error || ("服务返回 " + response.status)));
+                        return;
+                    }
+                    const message = data.choices?.[0]?.message;
+                    const text = message?.content;
+                    if(!text){ finishOCRModal(false, "77工作失败"); alert("AI没有返回结果，请检查 API 代理连接"); return; }
+                    const clean = text.replace(/```json/g,"").replace(/```/g,"").trim();
+                    let result;
+                    try { result = JSON.parse(clean); }
+                    catch(e) { finishOCRModal(false, "77工作失败"); alert("AI 返回内容解析失败，请重试或更换截图"); console.error("JSON 解析失败:", clean); return; }
+                    if(!Array.isArray(result) || result.length === 0){ finishOCRModal(false, "77工作失败"); alert("AI 返回数据格式异常，请重试"); return; }
+                    result.forEach((item,index)=>{
+                        if(index < orders.length){
+                            const name = normalizeOCRItemName(item.itemName);
+                            orders[index].itemName = name;
+                            orders[index].quantity = Number(item.quantity)||0;
+                            orders[index].rewardPages = Number(item.rewardPages)||0;
+                            orders[index].enabled=true;
+                            ensureItemExists(name);
+                        }
+                    });
+                    renderPriceTableDOM();
+                    renderFullPriceTableDOM();
+                    renderOrderListDOM();
+                    updateResults();
+                    document.getElementById("ocrNotice").style.display="block";
+                    finishOCRModal(true, "77工作完成");
+                } catch(error) {
+                    finishOCRModal(false, "77工作失败");
+                    console.error("请求失败: ", error);
+                    alert("请求代理服务失败，请检查你的 Worker URL 配置或网络状态。");
+                } finally {
+                    isRecognizing = false;
+                    if(ocrBtn) ocrBtn.disabled = false;
+                }
+            }
+
+            window.addItemRow = addItemRow;
+            window.resetDefaultItems = resetDefaultItems;
+            window.toggleAllOrders = toggleAllOrders;
+            window.enableTopOrders = enableTopOrders;
+            window.parseAndFillOCR = parseAndFillOCR;
+            window.renderFullPriceTableDOM = renderFullPriceTableDOM;
+            window.getItemPrice = getItemPrice;
+            // —— 云端同步钩子（供会员系统脚本调用） ——
+            window.__applyCloudFreight = function (name, price) {
+                const it = items.find(i => i.name === name);
+                if (it && Number(it.price) !== Number(price)) { it.price = price; return true; }
+                return false;
+            };
+            window.__renderFreight = function () {
+                renderPriceTableDOM();
+                renderFullPriceTableDOM();
+                renderOrderListDOM();
+                updateResults();
+                if (window.refreshGuildSales) window.refreshGuildSales();
+            };
+
+            treasureMapPriceInput.addEventListener('input', () => {
+                orders.forEach(o => updateSingleOrderDisplay(o.id));
+                updateResults();
+            });
+
+            renderPriceTableDOM();
+            renderFullPriceTableDOM();
+            renderOrderListDOM();
+            updateResults();
+        })();
+    </script>
+    <script>
+        (function () {
+            "use strict";
+            /* ================= 复刻模块通用工具 ================= */
+            function fmt(n) { n = Number(n) || 0; return Math.round(n).toLocaleString("zh-CN"); }
+            function fmt2(n) { n = Number(n) || 0; return n.toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+            function esc(s) { var d = document.createElement("div"); d.textContent = (s === null || s === undefined) ? "" : String(s); return d.innerHTML; }
+            function relTime(ts) {
+                var s = Math.floor((Date.now() - ts) / 1000);
+                if (s < 60) return "刚刚";
+                var m = Math.floor(s / 60);
+                if (m < 60) return m + "分钟前";
+                var h = Math.floor(m / 60);
+                if (h < 24) return h + "小时前";
+                var day = Math.floor(h / 24);
+                return day < 7 ? day + "天前" : new Date(ts).toLocaleDateString("zh-CN");
+            }
+            function shortTime(ts) {
+                var d = new Date(ts);
+                function p(x) { return x < 10 ? "0" + x : "" + x; }
+                return (d.getMonth() + 1) + "月" + d.getDate() + "日 " + p(d.getHours()) + ":" + p(d.getMinutes());
+            }
+
+            /* ================= 工匠采集价格（合成配方 + 固定材料数据库） ================= */
+            var PRICE_KEY = "nsh_guild_prices_v2";
+            var LOG_KEY = "nsh_price_logs_v1";
+            var FIXED_MAT_KEY = "nsh_fixed_mats_v1";
+
+            // 固定材料价格（数据库），存 localStorage
+            var DEFAULT_FIXED_MATS = {
+                "花蕊石": 10, "棕榈炭": 25, "小份调味品": 250,
+                "白菜": 500, "大米": 500, "酱料": 500, "豆腐": 500, "芝麻": 500, "番茄": 500,
+                "麻布": 125, "绸布": 1000, "橡木": 250, "刚玉": 1000, "宝石": 20000
+            };
+            var fixedMats = loadFixedMats();
+            function loadFixedMats() {
+                try {
+                    var raw = localStorage.getItem(FIXED_MAT_KEY);
+                    if (raw) { var obj = JSON.parse(raw); if (obj && typeof obj === "object") return Object.assign({}, DEFAULT_FIXED_MATS, obj); }
+                } catch (e) {}
+                return Object.assign({}, DEFAULT_FIXED_MATS);
+            }
+            function saveFixedMats() { try { localStorage.setItem(FIXED_MAT_KEY, JSON.stringify(fixedMats)); } catch (e) {} }
+            // 材料单价：采集材料按采集表「出售价」计入制造成本；固定材料取数据库价；否则取配方中填写价
+            function matPrice(m) {
+                if (!m || !m.name) return 0;
+                if (gatherInfo[m.name] !== undefined) return Number(gatherInfo[m.name].price) || 0; // 制造消耗采集材料 → 计入出售价成本
+                return fixedMats[m.name] !== undefined ? fixedMats[m.name] : (Number(m.price) || 0);
+            }
+
+            var DEFAULT_GUILD_ITEMS = [
+                { name: "如燕追风匣", stamina: 60, output: 1, chance: 40, mat1: { name: "粗铁矿", qty: 20, price: 0 }, mat2: { name: "麻布", qty: 24, price: 0 }, mat3: null },
+                { name: "惊鹊追风匣", stamina: 75, output: 1, chance: 20, mat1: { name: "粗铁矿", qty: 25, price: 0 }, mat2: { name: "麻布", qty: 30, price: 0 }, mat3: null },
+                { name: "归鸿追风匣", stamina: 90, output: 1, chance: 20, mat1: { name: "粗铁矿", qty: 30, price: 0 }, mat2: { name: "麻布", qty: 36, price: 0 }, mat3: null },
+                { name: "普通资源箱", stamina: 100, output: 1, chance: 20, mat1: { name: "花岗岩", qty: 4, price: 0 }, mat2: { name: "橡木", qty: 20, price: 0 }, mat3: null },
+                { name: "兰溪解玉砂", stamina: 60, output: 1, chance: 20, mat1: { name: "黄龙玉", qty: 2, price: 0 }, mat2: { name: "刚玉", qty: 3, price: 0 }, mat3: null },
+                { name: "清河解玉砂", stamina: 240, output: 1, chance: 0, mat1: { name: "汉白玉", qty: 2, price: 465 }, mat2: { name: "刚玉", qty: 12, price: 0 }, mat3: null },
+                { name: "装备鉴定书·60", stamina: 160, output: 1, chance: 0, mat1: { name: "银矿石", qty: 2, price: 0 }, mat2: { name: "绸布", qty: 8, price: 0 }, mat3: null },
+                { name: "百炼武器鉴定书", stamina: 800, output: 1, chance: 0, mat1: { name: "银矿石", qty: 10, price: 0 }, mat2: { name: "绸布", qty: 40, price: 0 }, mat3: null },
+                { name: "百炼头盔鉴定书", stamina: 800, output: 1, chance: 0, mat1: { name: "银矿石", qty: 10, price: 0 }, mat2: { name: "绸布", qty: 40, price: 0 }, mat3: null },
+                { name: "百炼戒指鉴定书", stamina: 900, output: 1, chance: 0, mat1: { name: "金矿石", qty: 10, price: 0 }, mat2: { name: "绸布", qty: 45, price: 0 }, mat3: null },
+                { name: "百炼上衣鉴定书", stamina: 1000, output: 1, chance: 0, mat1: { name: "寒铁矿石", qty: 10, price: 0 }, mat2: { name: "绸布", qty: 50, price: 0 }, mat3: null },
+                { name: "百炼耳饰鉴定书", stamina: 1000, output: 1, chance: 0, mat1: { name: "寒铁矿石", qty: 10, price: 0 }, mat2: { name: "绸布", qty: 50, price: 0 }, mat3: null },
+                { name: "百炼手镯鉴定书", stamina: 1100, output: 1, chance: 0, mat1: { name: "孔雀石", qty: 10, price: 496 }, mat2: { name: "绸布", qty: 55, price: 0 }, mat3: null },
+                { name: "百炼手套鉴定书", stamina: 900, output: 1, chance: 0, mat1: { name: "金矿石", qty: 10, price: 0 }, mat2: { name: "绸布", qty: 45, price: 0 }, mat3: null },
+                { name: "百炼腰带鉴定书", stamina: 1100, output: 1, chance: 0, mat1: { name: "孔雀石", qty: 10, price: 496 }, mat2: { name: "绸布", qty: 55, price: 0 }, mat3: null },
+                { name: "百炼项链鉴定书", stamina: 1100, output: 1, chance: 0, mat1: { name: "红纹石", qty: 10, price: 0 }, mat2: { name: "绸布", qty: 60, price: 0 }, mat3: null },
+                { name: "百炼鞋子鉴定书", stamina: 1100, output: 1, chance: 0, mat1: { name: "红纹石", qty: 10, price: 0 }, mat2: { name: "绸布", qty: 60, price: 0 }, mat3: null },
+                { name: "灵纹锥", stamina: 400, output: 1, chance: 0, mat1: { name: "红水晶", qty: 2, price: 0 }, mat2: { name: "宝石", qty: 1, price: 0 }, mat3: null },
+                { name: "神铸符石", stamina: 1200, output: 1, chance: 0, mat1: { name: "赤玉", qty: 6, price: 0 }, mat2: { name: "宝石", qty: 3, price: 0 }, mat3: null },
+                { name: "六合生脉散", stamina: 10, output: 1, chance: 12, mat1: { name: "中品仙鹤草", qty: 5, price: 0 }, mat2: { name: "中品紫珠", qty: 5, price: 0 }, mat3: { name: "棕榈炭", qty: 20, price: 0 } },
+                { name: "六合雪魄丹", stamina: 16, output: 6, chance: 16, mat1: { name: "中品三七", qty: 8, price: 0 }, mat2: { name: "中品蒲黄", qty: 8, price: 0 }, mat3: { name: "花蕊石", qty: 80, price: 0 } },
+                { name: "中品珠玑羹", stamina: 60, output: 1, chance: 8, mat1: { name: "中品牛肉", qty: 12, price: 0 }, mat2: { name: "白菜", qty: 6, price: 0 }, mat3: null },
+                { name: "中品玲珑羹", stamina: 60, output: 1, chance: 8, mat1: { name: "中品牛肉", qty: 12, price: 0 }, mat2: { name: "白菜", qty: 6, price: 0 }, mat3: null },
+                { name: "中品碎金饭", stamina: 60, output: 1, chance: 8, mat1: { name: "中品鸡蛋", qty: 12, price: 0 }, mat2: { name: "大米", qty: 6, price: 0 }, mat3: null },
+                { name: "中品金玉饭", stamina: 60, output: 1, chance: 4, mat1: { name: "中品鸡蛋", qty: 12, price: 0 }, mat2: { name: "大米", qty: 6, price: 0 }, mat3: null },
+                { name: "中品白斩鸡", stamina: 60, output: 1, chance: 4, mat1: { name: "中品鸡肉", qty: 12, price: 0 }, mat2: { name: "酱料", qty: 6, price: 0 }, mat3: null },
+                { name: "中品肉末豆腐", stamina: 60, output: 1, chance: 4, mat1: { name: "中品猪肉", qty: 12, price: 0 }, mat2: { name: "豆腐", qty: 6, price: 0 }, mat3: null },
+                { name: "中品麻婆豆腐", stamina: 60, output: 1, chance: 4, mat1: { name: "中品猪肉", qty: 12, price: 0 }, mat2: { name: "豆腐", qty: 6, price: 0 }, mat3: null },
+                { name: "中品松鼠鲤鱼", stamina: 60, output: 1, chance: 0, mat1: { name: "中品鱼肉", qty: 12, price: 0 }, mat2: { name: "番茄", qty: 6, price: 0 }, mat3: null },
+                { name: "中品灯影牛肉", stamina: 60, output: 1, chance: 0, mat1: { name: "中品牛肉", qty: 12, price: 0 }, mat2: { name: "芝麻", qty: 6, price: 0 }, mat3: null },
+                { name: "中品红焖羊肉", stamina: 60, output: 1, chance: 0, mat1: { name: "中品羊肉", qty: 12, price: 0 }, mat2: { name: "酱料", qty: 6, price: 0 }, mat3: null },
+                { name: "中品东坡肘子", stamina: 60, output: 1, chance: 0, mat1: { name: "中品猪肉", qty: 12, price: 0 }, mat2: { name: "酱料", qty: 6, price: 0 }, mat3: null },
+                { name: "五福百草丹", stamina: 8, output: 6, chance: 40, mat1: { name: "下品三七", qty: 4, price: 0 }, mat2: { name: "下品蒲黄", qty: 4, price: 0 }, mat3: { name: "花蕊石", qty: 40, price: 0 } },
+                { name: "五福回生散", stamina: 5, output: 1, chance: 40, mat1: { name: "下品仙鹤草", qty: 3, price: 0 }, mat2: { name: "下品紫珠", qty: 2, price: 0 }, mat3: { name: "棕榈炭", qty: 10, price: 0 } },
+                { name: "下品碎金饭", stamina: 30, output: 1, chance: 40, mat1: { name: "下品鸡蛋", qty: 6, price: 0 }, mat2: { name: "小份调味品", qty: 6, price: 0 }, mat3: null },
+                { name: "下品金玉饭", stamina: 30, output: 1, chance: 40, mat1: { name: "下品鸡蛋", qty: 6, price: 0 }, mat2: { name: "小份调味品", qty: 6, price: 0 }, mat3: null },
+                { name: "下品玲珑羹", stamina: 30, output: 1, chance: 40, mat1: { name: "下品牛肉", qty: 6, price: 0 }, mat2: { name: "小份调味品", qty: 6, price: 0 }, mat3: null },
+                { name: "下品珠玑羹", stamina: 30, output: 1, chance: 40, mat1: { name: "下品牛肉", qty: 6, price: 0 }, mat2: { name: "小份调味品", qty: 6, price: 0 }, mat3: null },
+                { name: "下品灯影牛肉", stamina: 30, output: 1, chance: 40, mat1: { name: "下品牛肉", qty: 6, price: 0 }, mat2: { name: "小份调味品", qty: 6, price: 0 }, mat3: null },
+                { name: "下品白斩鸡", stamina: 30, output: 1, chance: 40, mat1: { name: "下品鸡肉", qty: 6, price: 0 }, mat2: { name: "小份调味品", qty: 6, price: 0 }, mat3: null },
+                { name: "下品肉末豆腐", stamina: 30, output: 1, chance: 40, mat1: { name: "下品猪肉", qty: 6, price: 0 }, mat2: { name: "小份调味品", qty: 6, price: 0 }, mat3: null },
+                { name: "下品麻婆豆腐", stamina: 30, output: 1, chance: 40, mat1: { name: "下品猪肉", qty: 6, price: 0 }, mat2: { name: "小份调味品", qty: 6, price: 0 }, mat3: null },
+                { name: "下品东坡肘子", stamina: 30, output: 1, chance: 40, mat1: { name: "下品猪肉", qty: 6, price: 0 }, mat2: { name: "小份调味品", qty: 6, price: 0 }, mat3: null },
+                { name: "下品松鼠鲤鱼", stamina: 30, output: 1, chance: 40, mat1: { name: "下品鱼肉", qty: 6, price: 0 }, mat2: { name: "小份调味品", qty: 6, price: 0 }, mat3: null },
+                { name: "下品红焖羊肉", stamina: 30, output: 1, chance: 40, mat1: { name: "下品羊肉", qty: 6, price: 0 }, mat2: { name: "小份调味品", qty: 6, price: 0 }, mat3: null }
+            ];
+            var guildItems = loadGuildItems();
+
+            function loadGuildItems() {
+                try {
+                    var raw = localStorage.getItem(PRICE_KEY);
+                    if (raw) { var arr = JSON.parse(raw); if (Array.isArray(arr) && arr.length) return arr; }
+                } catch (e) {}
+                return JSON.parse(JSON.stringify(DEFAULT_GUILD_ITEMS));
+            }
+            function persistGuild() { try { localStorage.setItem(PRICE_KEY, JSON.stringify(guildItems)); } catch (e) {} }
+            function logChange(field, itemName, oldV, newV) {
+                try {
+                    var logs = JSON.parse(localStorage.getItem(LOG_KEY) || "[]");
+                    logs.unshift({ field: field, item: itemName, old: oldV, new: newV, ts: Date.now() });
+                    localStorage.setItem(LOG_KEY, JSON.stringify(logs.slice(0, 100)));
+                } catch (e) {}
+            }
+            // 材料成本（一次制造）= 全部材料价值（采集材料按出售价计入，可交易行购买）
+            function costOf(it) {
+                return matCost(it.mat1) + matCost(it.mat2) + (it.mat3 ? matCost(it.mat3) : 0);
+            }
+            function matCost(m) { return m && m.name ? (Number(m.qty) || 0) * matPrice(m) : 0; }
+            // 一次制造所需体力 = 制造体力本身（材料可在交易行购买，采集与制造为独立模块）
+            function totalStaminaOf(it) {
+                return Number(it.stamina) || 0;
+            }
+            // 一次制造的期望产出 = 基础产出 × (1 + 双倍概率)
+            function expectedOutputOf(it) {
+                var out = Math.max(1, Number(it.output) || 1);
+                var chance = Math.max(0, Number(it.chance) || 0) / 100;
+                return out * (1 + chance);
+            }
+
+            /* ================= 材料采集表（数据库，采集无需成本） ================= */
+            var GATHER_KEY = "nsh_gather_v1";
+            var DEFAULT_GATHER = {
+                "下品三七": { stamina: 5, qty: 5, chance: 40, price: 5 },
+                "下品蒲黄": { stamina: 5, qty: 5, chance: 40, price: 5 },
+                "下品仙鹤草": { stamina: 5, qty: 5, chance: 40, price: 5 },
+                "下品紫珠": { stamina: 5, qty: 5, chance: 40, price: 5 },
+                "下品鸡蛋": { stamina: 5, qty: 1, chance: 40, price: 5 },
+                "下品牛肉": { stamina: 5, qty: 1, chance: 40, price: 5 },
+                "下品鸡肉": { stamina: 5, qty: 1, chance: 40, price: 5 },
+                "下品猪肉": { stamina: 5, qty: 1, chance: 40, price: 7 },
+                "下品鱼肉": { stamina: 5, qty: 1, chance: 40, price: 8 },
+                "下品羊肉": { stamina: 5, qty: 1, chance: 40, price: 8 },
+                "中品三七": { stamina: 5, qty: 5, chance: 20, price: 5 },
+                "中品蒲黄": { stamina: 5, qty: 5, chance: 20, price: 5 },
+                "中品仙鹤草": { stamina: 5, qty: 5, chance: 16, price: 5 },
+                "中品紫珠": { stamina: 5, qty: 5, chance: 16, price: 5 },
+                "中品鸡蛋": { stamina: 5, qty: 1, chance: 12, price: 29 },
+                "中品牛肉": { stamina: 5, qty: 1, chance: 12, price: 28 },
+                "中品鸡肉": { stamina: 5, qty: 1, chance: 8, price: 29 },
+                "中品猪肉": { stamina: 5, qty: 1, chance: 8, price: 26 },
+                "中品鱼肉": { stamina: 5, qty: 1, chance: 4, price: 26 },
+                "中品羊肉": { stamina: 5, qty: 1, chance: 4, price: 29 },
+                "粗铁矿": { stamina: 3, qty: 1, chance: 40, price: 5 },
+                "铜矿石": { stamina: 80, qty: 1, chance: 40, price: 5 },
+                "花岗岩": { stamina: 25, qty: 1, chance: 20, price: 85 },
+                "黄龙玉": { stamina: 30, qty: 1, chance: 20, price: 107 },
+                "银矿石": { stamina: 80, qty: 1, chance: 20, price: 294 },
+                "红水晶": { stamina: 200, qty: 1, chance: 20, price: 530 },
+                "赤玉": { stamina: 200, qty: 1, chance: 20, price: 665 },
+                "金矿石": { stamina: 90, qty: 1, chance: 20, price: 304 },
+                "寒铁矿石": { stamina: 100, qty: 1, chance: 14, price: 419 },
+                "孔雀石": { stamina: 110, qty: 1, chance: 6, price: 496 },
+                "汉白玉": { stamina: 120, qty: 1, chance: 0, price: 465 }
+            };
+            var gatherInfo = loadGather();
+            function loadGather() {
+                try {
+                    var raw = localStorage.getItem(GATHER_KEY);
+                    if (raw) { var obj = JSON.parse(raw); if (obj && typeof obj === "object") return Object.assign({}, DEFAULT_GATHER, obj); }
+                } catch (e) {}
+                return Object.assign({}, DEFAULT_GATHER);
+            }
+            function saveGather() { try { localStorage.setItem(GATHER_KEY, JSON.stringify(gatherInfo)); } catch (e) {} }
+            // 双倍概率仅保存在本机：页面刷新后恢复默认值（不参与云端同步）
+            function applyDefaultChances() {
+                DEFAULT_GUILD_ITEMS.forEach(function (d) {
+                    var it = guildItems.find(function (g) { return g.name === d.name; });
+                    if (it) it.chance = d.chance;
+                });
+                Object.keys(DEFAULT_GATHER).forEach(function (n) {
+                    if (gatherInfo[n]) gatherInfo[n].chance = DEFAULT_GATHER[n].chance;
+                });
+            }
+            applyDefaultChances();
+            function renderGatherTable() {
+                var body = document.getElementById("gatherBody");
+                body.innerHTML = "";
+                Object.keys(gatherInfo).forEach(function (name) {
+                    var g = gatherInfo[name];
+                    var tr = document.createElement("tr");
+                    tr.innerHTML =
+                        "<td>" + esc(name) + "</td>" +
+                        "<td><input type=\"number\" min=\"0\" value=\"" + (Number(g.stamina) || 0) + "\" readonly title=\"采集固定数据\" style=\"text-align:right;\"></td>" +
+                        "<td><input type=\"number\" min=\"0\" value=\"" + (Number(g.qty) || 0) + "\" readonly title=\"采集固定数据\" style=\"text-align:right;\"></td>" +
+                        "<td><input type=\"number\" min=\"0\" max=\"100\" value=\"" + (Number(g.chance) || 0) + "\" data-mat=\"" + esc(name) + "\" data-f=\"chance\" style=\"text-align:right;\" title=\"双倍概率（可调）\"></td>" +
+                        "<td><input type=\"number\" min=\"0\" value=\"" + (Number(g.price) || 0) + "\" data-mat=\"" + esc(name) + "\" data-f=\"price\" style=\"text-align:right;color:var(--primary-dark);font-weight:600;\" title=\"采集材料价格（可调）\"></td>";
+                    body.appendChild(tr);
+                });
+            }
+            document.getElementById("gatherBody").addEventListener("input", function (e) {
+                var inp = e.target;
+                var matName = inp.getAttribute("data-mat");
+                var f = inp.getAttribute("data-f");
+                if (!matName || !gatherInfo[matName]) return;
+                var v = Math.max(0, Number(inp.value) || 0);
+                if (f === "chance") v = Math.min(100, v);
+                if (gatherInfo[matName][f] !== v) {
+                    gatherInfo[matName][f] = v;
+                    saveGather();
+                    // 出售价变化 → 记录待同步（云端共享）；双倍概率仅本机、不上传
+                    if (f === "price" && window.__registerPendingGather) window.__registerPendingGather(matName, v);
+                    renderGuildTable(); // 同步制作表中材料单价（采集材料只读显示出售价）
+                    refreshCostCells();
+                    calcCraftsman();
+                }
+            });
+
+            // 售价从「货运道具价格表」同步（只读）
+            function syncedSalePrice(it) {
+                var p = 0;
+                if (window.getItemPrice) p = window.getItemPrice(it.name);
+                return p || 0;
+            }
+            // 材料单价只读/可编辑：采集材料(0)与固定材料(数据库价)只读
+            function renderMatCell(idx, mat, prefix) {
+                if (!mat) return "<td><span class=\"g-name\" style=\"color:var(--text-secondary);\">—</span></td>";
+                var isGather = mat.name && gatherInfo[mat.name] !== undefined;
+                var isFixed = !isGather && mat.name && fixedMats[mat.name] !== undefined;
+                var priceInput;
+                if (isGather) {
+                    // 采集材料：单价显示采集表「出售价」（同步，只读）；制造时按此价计入成本
+                    var gPrice = Number(gatherInfo[mat.name].price) || 0;
+                    priceInput = "<input class=\"g-price\" value=\"" + gPrice + "\" readonly title=\"采集材料：价值来自下方采集表出售价\" style=\"background:var(--success-bg);color:var(--primary-dark);\">";
+                } else if (isFixed) {
+                    priceInput = "<input class=\"g-price\" value=\"" + fixedMats[mat.name] + "\" readonly title=\"固定材料价格\" style=\"background:var(--gold-bg);color:var(--primary-dark);\">";
+                } else {
+                    priceInput = "<input class=\"g-price\" value=\"" + (Number(mat.price) || 0) + "\" readonly title=\"配方固定材料单价\">";
+                }
+                // 配方固定：材料名、数量、单价全部只读
+                return "<td><div class=\"guild-mat\">" +
+                    "<input class=\"g-name\" value=\"" + esc(mat.name) + "\" readonly title=\"配方固定材料名\"><span class=\"g-x\">×</span>" +
+                    "<input class=\"g-num\" value=\"" + (Number(mat.qty) || 0) + "\" readonly title=\"配方固定数量\" style=\"text-align:center;\"><span class=\"g-x\">@</span>" +
+                    priceInput +
+                "</div></td>";
+            }
+            function renderGuildTable() {
+                var body = document.getElementById("guildTableBody");
+                var empty = document.getElementById("guildEmpty");
+                body.innerHTML = "";
+                if (!guildItems.length) { empty.style.display = "block"; return; }
+                empty.style.display = "none";
+                guildItems.forEach(function (it, i) {
+                    var tr = document.createElement("tr");
+                    tr.setAttribute("data-gidx", i);
+                    tr.innerHTML =
+                        "<td><input value=\"" + esc(it.name) + "\" readonly title=\"配方固定成品名\"></td>" +
+                        "<td><input value=\"" + (Number(it.stamina) || 0) + "\" readonly title=\"配方固定体力\" style=\"text-align:center;\"></td>" +
+                        "<td><input value=\"" + (Number(it.output) || 1) + "\" readonly title=\"配方固定产出\" style=\"text-align:center;\"></td>" +
+                        "<td><input data-idx=\"" + i + "\" data-f=\"chance\" type=\"number\" min=\"0\" max=\"100\" value=\"" + (Number(it.chance) || 0) + "\" style=\"text-align:center;background:#fff;\" title=\"双倍概率（唯一可调）\"></td>" +
+                        renderMatCell(i, it.mat1, "m1") +
+                        renderMatCell(i, it.mat2, "m2") +
+                        renderMatCell(i, it.mat3, "m3") +
+                        "<td class=\"sale-cell\" data-idx=\"" + i + "\" style=\"text-align:right;color:var(--primary-dark);font-weight:600;\">" + fmt(syncedSalePrice(it)) + "</td>" +
+                        "<td class=\"cost-cell\" data-cost=\"" + i + "\">" + fmt(costOf(it)) + "</td>" +
+                        "<td style=\"text-align:center;\"><button class=\"btn-icon\" data-del=\"" + i + "\" title=\"删除物品\">✕</button></td>";
+                    body.appendChild(tr);
+                });
+                // 只读单元格点击失焦（配方数据不可编辑）
+                body.querySelectorAll("input[readonly]").forEach(function (inp) { inp.addEventListener("click", function () { inp.blur(); }); });
+            }
+            function refreshCostCells() {
+                var els = document.querySelectorAll(".cost-cell[data-cost]");
+                for (var i = 0; i < els.length; i++) {
+                    var it = guildItems[Number(els[i].getAttribute("data-cost"))];
+                    els[i].textContent = fmt(it ? costOf(it) : 0);
+                }
+                var saleEls = document.querySelectorAll(".sale-cell[data-idx]");
+                for (var j = 0; j < saleEls.length; j++) {
+                    var git = guildItems[Number(saleEls[j].getAttribute("data-idx"))];
+                    saleEls[j].textContent = fmt(git ? syncedSalePrice(git) : 0);
+                }
+            }
+
+            document.getElementById("guildTableBody").addEventListener("input", function (e) {
+                var inp = e.target;
+                var idx = Number(inp.getAttribute("data-idx"));
+                var f = inp.getAttribute("data-f");
+                if (isNaN(idx) || !guildItems[idx]) return;
+                var it = guildItems[idx];
+                var lab = "", oldV = null, newV = null, changed = false;
+                function matOf(prefix) {
+                    if (prefix === "m1") return it.mat1;
+                    if (prefix === "m2") return it.mat2;
+                    if (prefix === "m3") { if (!it.mat3) it.mat3 = { name: "", qty: 0, price: 0 }; return it.mat3; }
+                    return null;
+                }
+                switch (f) {
+                    case "name": lab = "物品名"; oldV = it.name; newV = inp.value; it.name = inp.value; changed = (oldV !== newV); break;
+                    case "stamina": lab = "体力"; oldV = it.stamina; newV = Math.max(0, Number(inp.value) || 0); it.stamina = newV; changed = (oldV !== newV); break;
+                    case "output": lab = "产出数量"; oldV = it.output; newV = Math.max(1, Number(inp.value) || 1); it.output = newV; changed = (oldV !== newV); break;
+                    case "m1q": case "m2q": case "m3q": {
+                        var mm = matOf(f.slice(0, 2));
+                        if (!mm) break;
+                        lab = f.slice(0, 2) + " 数量"; oldV = mm.qty; newV = Math.max(0, Number(inp.value) || 0); mm.qty = newV; changed = (oldV !== newV); break;
+                    }
+                    case "m1p": case "m2p": case "m3p": {
+                        var mp = matOf(f.slice(0, 2));
+                        if (!mp) break;
+                        lab = f.slice(0, 2) + " 单价"; oldV = mp.price; newV = Math.max(0, Number(inp.value) || 0); mp.price = newV; changed = (oldV !== newV); break;
+                    }
+                    case "m1n": case "m2n": case "m3n": {
+                        var mn = matOf(f.slice(0, 2));
+                        if (mn) mn.name = inp.value;
+                        break;
+                    }
+                    case "chance": lab = "双倍概率"; oldV = it.chance; newV = Math.min(100, Math.max(0, Number(inp.value) || 0)); it.chance = newV; changed = (oldV !== newV); break;
+                }
+                if (changed && lab) logChange(lab, it.name, oldV, newV);
+                persistGuild();
+                refreshCostCells();
+                calcCraftsman();
+            });
+            document.getElementById("guildTableBody").addEventListener("click", function (e) {
+                var btn = e.target.closest("button[data-del]");
+                if (!btn) return;
+                var idx = Number(btn.getAttribute("data-del"));
+                if (guildItems.length <= 1) { alert("至少保留 1 个物品"); return; }
+                guildItems.splice(idx, 1);
+                persistGuild();
+                renderGuildTable();
+                calcCraftsman();
+            });
+
+            window.guildAddItem = function () {
+                guildItems.push({ name: "新物品" + (guildItems.length + 1), stamina: 100, output: 1, chance: 0, mat1: { name: "材料甲", qty: 10, price: 500 }, mat2: { name: "", qty: 0, price: 0 }, mat3: null });
+                persistGuild();
+                renderGuildTable();
+                calcCraftsman();
+            };
+            window.guildReset = function () {
+                if (!confirm("确定恢复默认配方？当前修改将被覆盖。")) return;
+                guildItems = JSON.parse(JSON.stringify(DEFAULT_GUILD_ITEMS));
+                try { localStorage.removeItem(LOG_KEY); } catch (e) {}
+                persistGuild();
+                renderGuildTable();
+                calcCraftsman();
+            };
+            window.toggleGuildLog = function () {
+                var wrap = document.getElementById("guildLogWrap");
+                var tbl = document.getElementById("guildTableWrap");
+                var btn = document.getElementById("guildLogBtn");
+                var show = wrap.style.display !== "block";
+                wrap.style.display = show ? "block" : "none";
+                tbl.style.display = show ? "none" : "block";
+                btn.textContent = show ? "↩️ 返回制作表" : "📝 修改记录";
+                if (show) {
+                    var list = document.getElementById("guildLogList");
+                    var logs = [];
+                    try { logs = JSON.parse(localStorage.getItem(LOG_KEY) || "[]"); } catch (e) {}
+                    if (!logs.length) { list.innerHTML = "<div style=\"text-align:center;color:var(--text-secondary);padding:18px;\">暂无修改记录</div>"; return; }
+                    list.innerHTML = logs.slice(0, 60).map(function (l) {
+                        return "<div class=\"log-item\"><div class=\"log-diff\"><b>" + esc(l.item) + "</b> 的 " + esc(l.field) + "：<span class=\"old\">" + esc(l.old) + "</span> → <span class=\"new\">" + esc(l.new) + "</span></div><div class=\"log-time\">" + relTime(l.ts) + " · " + shortTime(l.ts) + "</div></div>";
+                    }).join("");
+                }
+            };
+
+            /* ================= 固定材料价格（数据库，只读固定） ================= */
+            function renderFixedMatTable() {
+                var body = document.getElementById("fixedMatBody");
+                body.innerHTML = "";
+                Object.keys(fixedMats).forEach(function (name) {
+                    var tr = document.createElement("tr");
+                    tr.innerHTML =
+                        "<td>" + esc(name) + "</td>" +
+                        "<td><input type=\"number\" min=\"0\" step=\"1\" value=\"" + (Number(fixedMats[name]) || 0) + "\" readonly title=\"固定价格材料，固定不可调\" style=\"text-align:right;width:100%;background:var(--gold-bg);color:var(--primary-dark);font-weight:600;\"></td>";
+                    body.appendChild(tr);
+                });
+            }
+            // 货运道具价格表变动时刷新制作表售价列与工匠计算
+            window.refreshGuildSales = function () {
+                refreshCostCells();
+                calcCraftsman();
+            };
+            // —— 云端同步钩子（供会员系统脚本调用） ——
+            window.__applyCloudGather = function (name, price) {
+                if (gatherInfo[name] && Number(gatherInfo[name].price) !== Number(price)) {
+                    gatherInfo[name].price = Number(price) || 0;
+                    return true;
+                }
+                return false;
+            };
+            window.__renderGuild = function () {
+                renderGatherTable();
+                renderGuildTable();
+                refreshCostCells();
+                calcCraftsman();
+            };
+
+            /* ================= 工匠利润计算器（采集 + 制造） ================= */
+            var craftExpanded = false;
+            function computeCraft() {
+                var stamina = Math.max(0, Number(document.getElementById("craftStamina").value) || 0);
+                var rows = [];
+                // —— 采集方案（直接采集材料出售，无需成本） ——
+                Object.keys(gatherInfo).forEach(function (matName) {
+                    var g = gatherInfo[matName];
+                    var price = Number(g.price) || 0;
+                    var stOnce = Number(g.stamina) || 0;
+                    var qtyOnce = Number(g.qty) || 0;
+                    if (stOnce <= 0 || price <= 0 || qtyOnce <= 0) return;
+                    // 单体力净利 = 产出数量 × 单价 × (1 + 双倍概率) ÷ 采集体力
+                    var chance = (Number(g.chance) || 0) / 100;
+                    var perStamina = qtyOnce * price * (1 + chance) / stOnce;
+                    var times = Math.floor(stamina / stOnce);
+                    if (times <= 0) return;
+                    var incomeOnce = perStamina * stOnce; // 单次采集收入
+                    rows.push({
+                        type: "采集",
+                        name: matName,
+                        times: times,
+                        unitCost: 0,
+                        profit: incomeOnce * times,
+                        perStamina: perStamina,
+                        totalSt: stOnce
+                    });
+                });
+                // —— 制造方案（制造成品出售） ——
+                guildItems.forEach(function (it) {
+                    var sp = syncedSalePrice(it); // 售价与「货运道具价格表」同步
+                    if (sp <= 0) return;
+                    var totalSt = totalStaminaOf(it); // 所需体力 = 制造体力本身
+                    if (totalSt <= 0) return;
+                    var unitCost = costOf(it); // 一次制造的材料成本（采集材料按出售价计入）
+                    var expected = expectedOutputOf(it); // 期望产出（含双倍概率）
+                    // 单次制造收入 = 期望产出 × 售价；单体力净利 = (期望产出×售价 − 成本) ÷ 制造体力
+                    var incomeOnce = expected * sp;
+                    var profitOnce = incomeOnce - unitCost;
+                    var perStamina = profitOnce / totalSt; // 单体力净利润
+                    var times = Math.floor(stamina / totalSt); // 该体力可制造次数
+                    if (times <= 0) return;
+                    rows.push({
+                        type: "制造",
+                        name: it.name,
+                        times: times,
+                        unitCost: unitCost,
+                        profit: profitOnce * times,
+                        perStamina: perStamina,
+                        totalSt: totalSt
+                    });
+                });
+                rows.sort(function (a, b) { return b.perStamina - a.perStamina; });
+                return { rows: rows, stamina: stamina };
+            }
+            window.calcCraftsman = function () {
+                var c = computeCraft();
+                var bestBox = document.getElementById("craftBestBox");
+                var bestName = document.getElementById("craftBestName");
+                var bestStats = document.getElementById("craftBestStats");
+                var body = document.getElementById("craftRankBody");
+                var btn = document.getElementById("craftExpandBtn");
+                if (!c.rows.length) {
+                    bestBox.style.opacity = "0.55";
+                    bestName.textContent = "暂无有效方案";
+                    bestStats.textContent = "请先在「货运道具价格」填成品售价，或在「工匠采集价格」填采集出售价后返回本页";
+                    body.innerHTML = "<div class=\"rank-row\"><span style=\"grid-column:1/-1;text-align:center;color:var(--text-secondary);padding:16px;\">暂无有效方案：请在「货运道具价格」填成品售价，或「工匠采集价格」的采集表中填出售价</span></div>";
+                    return;
+                }
+                bestBox.style.opacity = "1";
+                var best = c.rows[0];
+                bestName.textContent = "⭐ " + best.name + (best.type ? "（" + best.type + "）" : "");
+                bestStats.textContent = "可进行 " + fmt(best.times) + " 次 ｜ 单体力净利 " + fmt2(best.perStamina) + " ｜ 预计赚取 " + (best.profit >= 0 ? "+" : "") + fmt(best.profit) + " 铜钱";
+                btn.textContent = craftExpanded ? "收起" : "展开全部";
+                var shown = craftExpanded ? c.rows : c.rows.slice(0, 8);
+                body.innerHTML = shown.map(function (r, i) {
+                    var tag = r.type === "采集"
+                        ? "<span class=\"tag tag-blue\">采集</span>"
+                        : "<span class=\"tag tag-gold\">制造</span>";
+                    return "<div class=\"rank-row" + (i === 0 ? " best" : "") + "\">" +
+                        "<span class=\"r-num\">" + (i + 1) + "</span>" +
+                        "<span class=\"r-name\">" + (i === 0 ? "<span class=\"star\">★</span>" : "") + esc(r.name) + " " + tag + "</span>" +
+                        "<span class=\"r-right hide-m\">" + (r.type === "采集" ? "无成本" : fmt(r.unitCost)) + "</span>" +
+                        "<span class=\"r-right hide-m\">" + fmt(r.times) + " 次</span>" +
+                        "<span class=\"r-right " + (r.profit >= 0 ? "profit-positive" : "profit-negative") + "\">" + (r.profit >= 0 ? "+" : "") + fmt(r.profit) + "</span>" +
+                        "<span class=\"r-right\">" + fmt2(r.perStamina) + "</span>" +
+                    "</div>";
+                }).join("");
+            };
+            window.toggleCraftExpand = function () { craftExpanded = !craftExpanded; calcCraftsman(); };
+
+            /* ================= 拍卖计算器 ================= */
+            var STRATS = {
+                six: [{ n: "最佳拍卖价格", p: 0.68 }, { n: "合适的拍卖价格", p: 0.72 }, { n: "不赚钱但不亏", p: 0.79 }],
+                twelve: [{ n: "卡价格但不过分", p: 0.83 }, { n: "防止被卡，不赚的价格", p: 0.87 }]
+            };
+            var AUCTION_DIV = { six: 5, twelve: 11 };
+            function getAuctionMode() { return document.querySelector("input[name=\"auctionMode\"]:checked").value; }
+            window.calcAuction = function () {
+                var start = Math.max(0, Number(document.getElementById("auctionStart").value) || 0);
+                var mode = getAuctionMode();
+                var div = AUCTION_DIV[mode];
+                document.getElementById("auctionModeLabel").innerHTML =
+                    (mode === "six" ? "👥 6人拍卖：个人拍得后其余 <b>5</b> 人分配 → 其他人收益 = 拍卖价 × 0.95 ÷ 5" : "👥 12人拍卖：个人拍得后其余 <b>11</b> 人分配 → 其他人收益 = 拍卖价 × 0.95 ÷ 11");
+                var box = document.getElementById("auctionResults");
+                if (start <= 0) { box.innerHTML = "<div class=\"formula-box\">请输入聚珍行价格</div>"; return; }
+                var html = "";
+                STRATS[mode].forEach(function (s, i) {
+                    var bid = Math.floor(start * s.p);
+                    var personal = Math.floor(start * 0.95 - bid);
+                    var others = Math.floor(bid * 0.95 / div);
+                    html += "<div class=\"strategy-row" + (i === 0 ? " best-row" : "") + "\">" +
+                        "<div class=\"s-name\">" + (i === 0 ? "<span class=\"star\">⭐</span> " : "") + s.n + "</div>" +
+                        "<div class=\"s-cell\">拍卖价<br><strong style=\"color:var(--primary-dark);\">" + fmt(bid) + "</strong></div>" +
+                        "<div class=\"s-cell\">个人赚取<br><strong class=\"" + (personal >= 0 ? "profit-positive" : "profit-negative") + "\">" + (personal >= 0 ? "+" : "") + fmt(personal) + "</strong></div>" +
+                        "<div class=\"s-cell\">其他人收益<br><strong>" + fmt(others) + "</strong></div>" +
+                    "</div>";
+                });
+                box.innerHTML = html;
+                calcCustomAuction();
+            };
+            window.calcCustomAuction = function () {
+                var start = Math.max(0, Number(document.getElementById("auctionStart").value) || 0);
+                var bid = Math.max(0, Number(document.getElementById("auctionCustom").value) || 0);
+                var mode = getAuctionMode();
+                var div = AUCTION_DIV[mode];
+                var personal = Math.floor(start * 0.95 - bid);
+                var others = Math.floor(bid * 0.95 / div);
+                document.getElementById("auctionCustomResult").innerHTML =
+                    "个人赚取：<b class=\"" + (personal >= 0 ? "profit-positive" : "profit-negative") + "\">" + (personal >= 0 ? "+" : "") + fmt(personal) + "</b>　｜　其他人收益：<b>" + fmt(others) + "</b>";
+            };
+
+            /* ================= 标签页切换 ================= */
+            window.switchTab = function (name) {
+                var panels = document.querySelectorAll(".tab-panel");
+                for (var i = 0; i < panels.length; i++) panels[i].style.display = "none";
+                var btns = document.querySelectorAll(".tab-btn");
+                for (var j = 0; j < btns.length; j++) btns[j].classList.toggle("active", btns[j].getAttribute("data-tab") === name);
+                var panel = document.getElementById("panel-" + name);
+                if (panel) panel.style.display = "block";
+                if (name === "craftsman") calcCraftsman();
+                else if (name === "auction") calcAuction();
+                else if (name === "price") { renderGuildTable(); renderFixedMatTable(); renderGatherTable(); }
+                else if (name === "prices" && window.renderFullPriceTableDOM) renderFullPriceTableDOM();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            };
+
+            /* ================= 初始化 ================= */
+            renderGuildTable();
+            renderFixedMatTable();
+            renderGatherTable();
+            calcCraftsman();
+            calcAuction();
+            document.getElementById("craftStamina").addEventListener("input", calcCraftsman);
+            document.getElementById("auctionStart").addEventListener("change", calcAuction);
+            document.getElementById("auctionStart").addEventListener("input", calcAuction);
+            document.getElementById("auctionCustom").addEventListener("input", calcCustomAuction);
+            // 固定材料价格编辑 → 保存数据库并联动制作表
+            document.getElementById("fixedMatBody").addEventListener("input", function (e) {
+                var inp = e.target;
+                var matName = inp.getAttribute("data-mat");
+                if (!matName || fixedMats[matName] === undefined) return;
+                var v = Math.max(0, Number(inp.value) || 0);
+                if (fixedMats[matName] !== v) {
+                    logChange("材料单价", matName, fixedMats[matName], v);
+                    fixedMats[matName] = v;
+                    saveFixedMats();
+                    renderGuildTable();
+                    calcCraftsman();
+                }
+            });
+        })();
+    </script>
+    <script>
+        (function () {
+            "use strict";
+            /* ================= 会员系统 + 云端价格同步 ================= */
+            // TODO: 将 API_BASE 替换为你的 Cloudflare Worker 域名（与 OCR 同一个 Worker）
+            var API_BASE = "https://nsh-ocr-proxy.sinpne5.workers.dev";
+            var TOKEN_KEY = "nsh_token_v1";
+            var POLL_MS = 30000; // 每 30 秒自动拉取一次云端价格
+
+            var currentUser = null;
+            var pendingFreight = {}; // name -> { price, updated_at }
+            var pendingGather = {};  // matName -> { price, updated_at }
+            var authMode = "login";
+
+            function esc(s) { var d = document.createElement("div"); d.textContent = (s === null || s === undefined) ? "" : String(s); return d.innerHTML; }
+            function getToken() { try { return localStorage.getItem(TOKEN_KEY) || ""; } catch (e) { return ""; } }
+            function setToken(t) { try { localStorage.setItem(TOKEN_KEY, t); } catch (e) {} }
+            function clearToken() { try { localStorage.removeItem(TOKEN_KEY); } catch (e) {} }
+
+            window.__getPendingFreight = function () { return pendingFreight; };
+            window.__getPendingGather = function () { return pendingGather; };
+
+            async function api(path, method, body) {
+                var headers = { "Content-Type": "application/json" };
+                var token = getToken();
+                if (token) headers["Authorization"] = "Bearer " + token;
+                var resp;
+                try {
+                    resp = await fetch(API_BASE + path, {
+                        method: method,
+                        headers: headers,
+                        body: body ? JSON.stringify(body) : undefined
+                    });
+                } catch (e) {
+                    return { ok: false, error: "网络错误，请检查 Worker 地址或网络" };
+                }
+                try { return await resp.json(); } catch (e) { return { ok: false, error: "服务响应异常 (" + resp.status + ")" }; }
+            }
+
+            /* ---------- 待同步价格注册钩子（被 Script1 / Script2 调用） ---------- */
+            window.__registerPendingFreight = function (name, price) {
+                pendingFreight[name] = { price: price, updated_at: Date.now() };
+                refreshSyncBadge();
+            };
+            window.__registerPendingGather = function (name, price) {
+                pendingGather[name] = { price: price, updated_at: Date.now() };
+                refreshSyncBadge();
+            };
+            window.__renamePendingFreight = function (oldName, newName) {
+                if (pendingFreight[oldName]) { pendingFreight[newName] = pendingFreight[oldName]; delete pendingFreight[oldName]; }
+            };
+            window.__removePendingFreight = function (name) { delete pendingFreight[name]; refreshSyncBadge(); };
+            window.__clearPendingFreight = function () { pendingFreight = {}; refreshSyncBadge(); };
+
+            function refreshSyncBadge() {
+                var n = Object.keys(pendingFreight).length + Object.keys(pendingGather).length;
+                var btn = document.getElementById("syncBtn");
+                if (btn) {
+                    btn.textContent = n > 0 ? "☁️ 同步价格 (" + n + ")" : "☁️ 同步价格";
+                    btn.style.background = n > 0 ? "linear-gradient(135deg,#f7b8ad,#e89284)" : "";
+                }
+                var hint = document.getElementById("syncHint");
+                if (hint) {
+                    hint.innerHTML = n > 0
+                        ? ("⚠️ 有 <b>" + n + "</b> 项本地价格修改尚未同步（仅高级会员可上传共享）")
+                        : "☁️ 云端价格共享：高级会员上传后，全员每 30 秒自动拉取最新价格";
+                }
+            }
+            window.__onSyncCountChange = refreshSyncBadge;
+
+            /* ---------- 会员栏 ---------- */
+            function renderMemberBar() {
+                var actions = document.getElementById("memberActions");
+                var status = document.getElementById("memberStatus");
+                if (!actions) return;
+                if (!currentUser) {
+                    status.textContent = "未登录 · 改价仅保存在本机";
+                    actions.innerHTML =
+                        '<button class="btn-sm" onclick="NSH.openLogin()">🔑 登录</button>' +
+                        '<button class="btn-sm" onclick="NSH.openRegister()">📝 注册</button>';
+                } else {
+                    var lvText = currentUser.level === 3 ? "管理员" : currentUser.level === 2 ? "高级会员" : "普通会员";
+                    status.innerHTML = "👤 " + esc(currentUser.username) + ' · <span class="lv-tag lv-' + currentUser.level + '">Lv' + currentUser.level + ' ' + lvText + '</span>';
+                    var html = '<button class="btn-sm" onclick="NSH.doSign()">📅 签到</button>';
+                    if (currentUser.level >= 2) html += '<button class="btn-sm primary" id="syncBtn" onclick="NSH.syncPrices()">☁️ 同步价格</button>';
+                    if (currentUser.level >= 3) html += '<button class="btn-sm" onclick="NSH.openAdmin()">🛡️ 管理</button>';
+                    html += '<button class="btn-sm" onclick="NSH.logout()">退出</button>';
+                    actions.innerHTML = html;
+                }
+                refreshSyncBadge();
+            }
+
+            /* ---------- 登录 / 注册 ---------- */
+            function openAuth(title, mode) {
+                authMode = mode;
+                document.getElementById("authTitle").textContent = title;
+                document.getElementById("authSwitch").textContent = mode === "login" ? "没有账号？去注册" : "已有账号？去登录";
+                document.getElementById("authError").textContent = "";
+                document.getElementById("authOverlay").style.display = "flex";
+                document.getElementById("authUsername").focus();
+            }
+            function submitAuth() {
+                var username = document.getElementById("authUsername").value.trim();
+                var password = document.getElementById("authPassword").value;
+                var err = document.getElementById("authError");
+                if (!username) { err.textContent = "请填写用户名"; return; }
+                if (!password) { err.textContent = "请填写密码"; return; }
+                var path = authMode === "login" ? "/api/auth/login" : "/api/auth/register";
+                api(path, "POST", { username: username, password: password }).then(function (data) {
+                    if (data && data.ok) {
+                        if (data.token) setToken(data.token);
+                        if (data.user) currentUser = { username: data.user.username, level: data.user.level, sign_count: data.user.sign_count };
+                        document.getElementById("authOverlay").style.display = "none";
+                        renderMemberBar();
+                        alert(data.message || "操作成功");
+                    } else {
+                        err.textContent = (data && data.error) || "操作失败，请检查网络";
+                    }
+                });
+            }
+            function logout() {
+                clearToken();
+                currentUser = null;
+                renderMemberBar();
+            }
+
+            /* ---------- 签到 ---------- */
+            function doSign() {
+                if (!currentUser) { alert("请先登录"); return; }
+                api("/api/auth/sign", "POST").then(function (data) {
+                    if (data && data.ok) {
+                        currentUser.level = data.level;
+                        currentUser.sign_count = data.sign_count;
+                        renderMemberBar();
+                        alert(data.upgraded ? "🎉 签到成功！已升级为高级会员，现在可以同步价格了！" : "✅ 签到成功！");
+                    } else {
+                        alert((data && data.error) || "签到失败");
+                        if (data && data.error && /登录|封禁/.test(data.error)) logout();
+                    }
+                });
+            }
+
+            /* ---------- 拉取云端价格（所有人，每 30 秒） ---------- */
+            async function pullPrices() {
+                try {
+                    var data = await api("/api/prices", "GET");
+                    if (!data || !data.ok) return false;
+                    var changed = false;
+                    (data.freight || []).forEach(function (p) {
+                        if (pendingFreight[p.name]) return; // 本地有未同步修改，避免被覆盖
+                        if (window.__applyCloudFreight && window.__applyCloudFreight(p.name, p.price)) changed = true;
+                    });
+                    (data.gather || []).forEach(function (p) {
+                        if (pendingGather[p.name]) return;
+                        if (window.__applyCloudGather && window.__applyCloudGather(p.name, p.price)) changed = true;
+                    });
+                    if (changed) {
+                        if (window.__renderFreight) window.__renderFreight();
+                        if (window.__renderGuild) window.__renderGuild();
+                    }
+                    return true;
+                } catch (e) {
+                    console.warn("拉取云端价格失败", e);
+                    return false;
+                }
+            }
+
+            /* ---------- 上传本地价格到云端（高级会员，手动确认） ---------- */
+            function syncPrices() {
+                if (!currentUser) { alert("请先登录"); return; }
+                if (currentUser.level < 2) { alert("普通会员无法同步价格，请每天签到（累计 7 天）或联系管理员升级为高级会员"); return; }
+                var freightItems = Object.keys(pendingFreight).map(function (name) {
+                    var v = pendingFreight[name];
+                    return { key: "freight:" + name, name: name, category: "freight", price: v.price, updated_at: v.updated_at };
+                });
+                var gatherItems = Object.keys(pendingGather).map(function (name) {
+                    var v = pendingGather[name];
+                    return { key: "gather:" + name, name: name, category: "gather", price: v.price, updated_at: v.updated_at };
+                });
+                var items = freightItems.concat(gatherItems);
+                if (!items.length) { alert("本地没有待同步的价格修改"); return; }
+                if (!confirm("确定将 " + items.length + " 项本地价格上传同步到云端吗？全帮会成员将看到最新价格。")) return;
+                api("/api/prices", "POST", { items: items }).then(function (data) {
+                    if (data && data.ok) {
+                        (data.accepted || []).forEach(function (a) {
+                            if (a.category === "freight") delete pendingFreight[a.name];
+                            else delete pendingGather[a.name];
+                        });
+                        var msg = data.message || ("已同步 " + (data.accepted || []).length + " 项价格");
+                        if (data.conflicts && data.conflicts.length) {
+                            msg += "\n\n以下 " + data.conflicts.length + " 项云端已有更新版本，已为你保留云端最新价格：\n" +
+                                data.conflicts.map(function (c) { return "· " + c.name; }).join("\n");
+                            data.conflicts.forEach(function (c) {
+                                if (c.category === "freight") { delete pendingFreight[c.name]; if (window.__applyCloudFreight) window.__applyCloudFreight(c.name, c.cloud_price); }
+                                else { delete pendingGather[c.name]; if (window.__applyCloudGather) window.__applyCloudGather(c.name, c.cloud_price); }
+                            });
+                            if (window.__renderFreight) window.__renderFreight();
+                            if (window.__renderGuild) window.__renderGuild();
+                        }
+                        refreshSyncBadge();
+                        alert(msg);
+                    } else {
+                        alert((data && data.error) || "同步失败，请检查网络");
+                        if (data && data.error && /登录|封禁/.test(data.error)) logout();
+                    }
+                });
+            }
+
+            /* ---------- 管理员 ---------- */
+            function showAdminTab(tab) {
+                document.getElementById("adminMembers").style.display = tab === "members" ? "block" : "none";
+                document.getElementById("adminLogs").style.display = tab === "logs" ? "block" : "none";
+                document.getElementById("adminTabMembers").classList.toggle("active", tab === "members");
+                document.getElementById("adminTabLogs").classList.toggle("active", tab === "logs");
+            }
+            function openAdmin() {
+                if (!currentUser || currentUser.level < 3) { alert("需要管理员权限"); return; }
+                document.getElementById("adminOverlay").style.display = "flex";
+                showAdminTab("members");
+                loadAdminMembers();
+                loadAdminLogs();
+            }
+            function loadAdminMembers() {
+                api("/api/admin/members", "GET").then(function (data) {
+                    var box = document.getElementById("adminMembers");
+                    if (!data || !data.ok) { box.innerHTML = '<div class="admin-empty">' + esc((data && data.error) || "加载失败") + "</div>"; return; }
+                    if (!data.members.length) { box.innerHTML = '<div class="admin-empty">暂无会员</div>'; return; }
+                    box.innerHTML = data.members.map(function (m) {
+                        var lvText = m.level === 3 ? "管理员" : m.level === 2 ? "高级会员" : "普通会员";
+                        var banBtn = m.banned === 1
+                            ? '<button class="btn-sm" onclick="NSH.adminUnban(\'' + m.username + '\')">解封</button>'
+                            : '<button class="btn-sm" onclick="NSH.adminBan(\'' + m.username + '\')">封禁</button>';
+                        var upBtn = (m.level < 3)
+                            ? '<button class="btn-sm" onclick="NSH.adminLevel(\'' + m.username + '\',' + (m.level === 2 ? 1 : 2) + ')">' + (m.level === 2 ? "降为普通" : "升为高级") + "</button>"
+                            : "";
+                        return '<div class="admin-row">' +
+                            '<div class="admin-info"><b>' + esc(m.username) + '</b> <span class="lv-tag lv-' + m.level + '">Lv' + m.level + ' ' + lvText + '</span> ' +
+                            (m.banned === 1 ? '<span class="tag tag-red">已封禁</span>' : "") +
+                            '<br><small>累计签到 ' + (m.sign_count || 0) + ' 次</small></div>' +
+                            '<div class="admin-ops">' + upBtn + ' ' + banBtn + "</div>" +
+                            "</div>";
+                    }).join("");
+                });
+            }
+            function loadAdminLogs() {
+                api("/api/admin/logs?limit=100", "GET").then(function (data) {
+                    var box = document.getElementById("adminLogs");
+                    if (!data || !data.ok) { box.innerHTML = '<div class="admin-empty">' + esc((data && data.error) || "加载失败") + "</div>"; return; }
+                    if (!data.logs.length) { box.innerHTML = '<div class="admin-empty">暂无改价记录</div>'; return; }
+                    box.innerHTML = data.logs.map(function (l) {
+                        var t = new Date(l.ts);
+                        function p(x) { return x < 10 ? "0" + x : x; }
+                        var timeStr = (t.getMonth() + 1) + "-" + t.getDate() + " " + p(t.getHours()) + ":" + p(t.getMinutes());
+                        var cat = l.category === "gather" ? "采集" : "货运";
+                        var oldV = (Number(l.old_price) || 0).toLocaleString("zh-CN");
+                        var newV = (Number(l.new_price) || 0).toLocaleString("zh-CN");
+                        return '<div class="admin-row admin-log">' +
+                            '<div><b>' + esc(l.username) + '</b> 修改 <b>' + esc(l.name) + '</b>（' + cat + '）<br>' +
+                            '<span class="old">' + oldV + '</span> → <span class="new">' + newV + '</span></div>' +
+                            '<div class="log-time">' + timeStr + "</div>" +
+                            "</div>";
+                    }).join("");
+                });
+            }
+            function adminBan(username) {
+                var reason = prompt("请输入封禁原因（将展示给被封用户）：");
+                if (reason === null) return;
+                api("/api/admin/ban", "POST", { username: username, reason: reason || "违反价格管理规定" }).then(function (data) {
+                    alert((data && data.message) || (data && data.error) || "操作失败");
+                    loadAdminMembers();
+                });
+            }
+            function adminUnban(username) {
+                api("/api/admin/unban", "POST", { username: username }).then(function (data) {
+                    alert((data && data.message) || (data && data.error) || "操作失败");
+                    loadAdminMembers();
+                });
+            }
+            function adminLevel(username, level) {
+                api("/api/admin/setlevel", "POST", { username: username, level: level }).then(function (data) {
+                    alert((data && data.message) || (data && data.error) || "操作失败");
+                    loadAdminMembers();
+                });
+            }
+
+            /* ---------- 会话恢复 ---------- */
+            function restoreSession() {
+                if (!getToken()) return;
+                api("/api/auth/me", "GET").then(function (data) {
+                    if (data && data.ok && data.user) {
+                        currentUser = { username: data.user.username, level: data.user.level, sign_count: data.user.sign_count };
+                    } else {
+                        clearToken();
+                    }
+                    renderMemberBar();
+                });
+            }
+
+            /* ---------- 对外暴露（供 HTML 内联 onclick 调用） ---------- */
+            window.NSH = {
+                openLogin: function () { openAuth("🔑 登录", "login"); },
+                openRegister: function () { openAuth("📝 注册", "register"); },
+                switchAuthMode: function () { openAuth(authMode === "login" ? "📝 注册" : "🔑 登录", authMode === "login" ? "register" : "login"); },
+                closeAuth: function () { document.getElementById("authOverlay").style.display = "none"; },
+                submitAuth: submitAuth,
+                logout: logout,
+                doSign: doSign,
+                syncPrices: syncPrices,
+                openAdmin: openAdmin,
+                showAdminTab: showAdminTab,
+                adminBan: adminBan,
+                adminUnban: adminUnban,
+                adminLevel: adminLevel
+            };
+
+            /* ---------- 初始化 ---------- */
+            renderMemberBar();
+            restoreSession();
+            pullPrices();
+            setInterval(pullPrices, POLL_MS);
+        })();
+    </script>
+</body>
+</html>
