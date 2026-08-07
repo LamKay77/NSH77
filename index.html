@@ -2021,7 +2021,7 @@
                 const ocrBtn = document.querySelector('button[onclick="aiOCRRecognize()"]');
                 if(ocrBtn) ocrBtn.disabled = true;
                 showOCRModal();
-                const workerURL = "https://nsh-ocr-proxy.sinpne5.workers.dev";
+                const workerURL = "https://api.lamkay777.me";
                 try {
                     const response = await fetch(workerURL, {
                         method:"POST",
@@ -2659,7 +2659,7 @@
             "use strict";
             /* ================= 会员系统 + 云端价格同步 ================= */
             // TODO: 将 API_BASE 替换为你的 Cloudflare Worker 域名（与 OCR 同一个 Worker）
-            var API_BASE = "https://nsh-ocr-proxy.sinpne5.workers.dev";
+            var API_BASE = "https://api.lamkay777.me";
             var TOKEN_KEY = "nsh_token_v1";
             var POLL_MS = 600000; // 每 10 分钟自动拉取一次云端价格
 
