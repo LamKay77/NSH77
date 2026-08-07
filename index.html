@@ -945,7 +945,7 @@
 
                 <div class="highlight-box">
                     <label style="color:var(--primary-dark);font-weight:500;">📜 宝图残页单价（拍卖行售价）</label>
-                    <input type="number" id="treasureMapPrice" class="highlight-input" value="12000" min="0" step="1" placeholder="输入宝图残页单价">
+                    <input type="number" id="treasureMapPrice" class="highlight-input" value="11585" min="0" step="1" placeholder="输入宝图残页单价">
                     <div class="fee-note">💡 拍卖行出售自动扣除 <strong>5% 手续费</strong>（实际到手 95%）</div>
                 </div>
 
@@ -1968,8 +1968,9 @@
                     { id: 'item_45', name: '下品红焖羊肉', price: 1350 },
                 ];
                 orders.forEach((o, i) => o.itemName = items[i % items.length].name);
-                treasureMapPriceInput.value = 12000;
+                treasureMapPriceInput.value = 11585;
                 if (window.__clearPendingFreight) window.__clearPendingFreight();
+                if (window.__clearPendingTreasure) window.__clearPendingTreasure();
                 renderPriceTableDOM();
                 renderFullPriceTableDOM();
                 renderOrderListDOM();
@@ -2093,6 +2094,15 @@
                 orders.forEach(o => updateSingleOrderDisplay(o.id));
                 updateResults();
             });
+            // 宝图残页单价云端同步钩子（供会员系统脚本调用）
+            window.__applyCloudTreasure = function (price) {
+                var v = Math.max(0, Math.floor(Number(price) || 0));
+                if (Number(treasureMapPriceInput.value) === v) return false;
+                treasureMapPriceInput.value = v;
+                orders.forEach(o => updateSingleOrderDisplay(o.id));
+                updateResults();
+                return true;
+            };
 
             renderPriceTableDOM();
             renderFullPriceTableDOM();
@@ -2666,6 +2676,8 @@
             var currentUser = null;
             var pendingFreight = {}; // name -> { price, updated_at }
             var pendingGather = {};  // matName -> { price, updated_at }
+            var pendingTreasure = null; // 宝图残页单价 -> { price, updated_at }（单项）
+            var TREASURE_NAME = "宝图残页";
             var authMode = "login";
 
             function esc(s) { var d = document.createElement("div"); d.textContent = (s === null || s === undefined) ? "" : String(s); return d.innerHTML; }
@@ -2675,6 +2687,7 @@
 
             window.__getPendingFreight = function () { return pendingFreight; };
             window.__getPendingGather = function () { return pendingGather; };
+            window.__getPendingTreasure = function () { return pendingTreasure; };
 
             async function api(path, method, body) {
                 var headers = { "Content-Type": "application/json" };
@@ -2702,14 +2715,19 @@
                 pendingGather[name] = { price: price, updated_at: Date.now() };
                 refreshSyncBadge();
             };
+            window.__registerPendingTreasure = function (price) {
+                pendingTreasure = { price: Math.max(0, Math.floor(Number(price) || 0)), updated_at: Date.now() };
+                refreshSyncBadge();
+            };
             window.__renamePendingFreight = function (oldName, newName) {
                 if (pendingFreight[oldName]) { pendingFreight[newName] = pendingFreight[oldName]; delete pendingFreight[oldName]; }
             };
             window.__removePendingFreight = function (name) { delete pendingFreight[name]; refreshSyncBadge(); };
             window.__clearPendingFreight = function () { pendingFreight = {}; refreshSyncBadge(); };
+            window.__clearPendingTreasure = function () { pendingTreasure = null; refreshSyncBadge(); };
 
             function refreshSyncBadge() {
-                var n = Object.keys(pendingFreight).length + Object.keys(pendingGather).length;
+                var n = Object.keys(pendingFreight).length + Object.keys(pendingGather).length + (pendingTreasure ? 1 : 0);
                 var btn = document.getElementById("syncBtn");
                 if (btn) {
                     btn.textContent = n > 0 ? "☁️ 同步价格 (" + n + ")" : "☁️ 同步价格";
@@ -2813,6 +2831,13 @@
                         if (pendingGather[p.name]) return;
                         if (window.__applyCloudGather && window.__applyCloudGather(p.name, p.price)) changed = true;
                     });
+                    // 宝图残页单价（单项）：本地有未同步修改时不覆盖，否则应用云端最新一条
+                    var treasureItems = data.treasure || [];
+                    if (treasureItems.length && !pendingTreasure) {
+                        var bestT = null;
+                        treasureItems.forEach(function (t) { if (!bestT || t.updated_at > bestT.updated_at) bestT = t; });
+                        if (bestT && window.__applyCloudTreasure && window.__applyCloudTreasure(bestT.price)) changed = true;
+                    }
                     if (changed) {
                         if (window.__renderFreight) window.__renderFreight();
                         if (window.__renderGuild) window.__renderGuild();
@@ -2857,14 +2882,18 @@
                     var v = pendingGather[name];
                     return { key: "gather:" + name, name: name, category: "gather", price: v.price, updated_at: v.updated_at };
                 });
-                var items = freightItems.concat(gatherItems);
+                var treasureItems = pendingTreasure
+                    ? [{ key: "treasure:" + TREASURE_NAME, name: TREASURE_NAME, category: "treasure", price: pendingTreasure.price, updated_at: pendingTreasure.updated_at }]
+                    : [];
+                var items = freightItems.concat(gatherItems, treasureItems);
                 if (!items.length) { alert("本地没有待同步的价格修改"); return; }
                 if (!confirm("确定将 " + items.length + " 项本地价格上传同步到云端吗？全帮会成员将看到最新价格。")) return;
                 api("/api/prices", "POST", { items: items }).then(function (data) {
                     if (data && data.ok) {
                         (data.accepted || []).forEach(function (a) {
                             if (a.category === "freight") delete pendingFreight[a.name];
-                            else delete pendingGather[a.name];
+                            else if (a.category === "gather") delete pendingGather[a.name];
+                            else if (a.category === "treasure") pendingTreasure = null;
                         });
                         var msg = data.message || ("已同步 " + (data.accepted || []).length + " 项价格");
                         if (data.conflicts && data.conflicts.length) {
@@ -2872,7 +2901,8 @@
                                 data.conflicts.map(function (c) { return "· " + c.name; }).join("\n");
                             data.conflicts.forEach(function (c) {
                                 if (c.category === "freight") { delete pendingFreight[c.name]; if (window.__applyCloudFreight) window.__applyCloudFreight(c.name, c.cloud_price); }
-                                else { delete pendingGather[c.name]; if (window.__applyCloudGather) window.__applyCloudGather(c.name, c.cloud_price); }
+                                else if (c.category === "gather") { delete pendingGather[c.name]; if (window.__applyCloudGather) window.__applyCloudGather(c.name, c.cloud_price); }
+                                else if (c.category === "treasure") { pendingTreasure = null; if (window.__applyCloudTreasure) window.__applyCloudTreasure(c.cloud_price); }
                             });
                             if (window.__renderFreight) window.__renderFreight();
                             if (window.__renderGuild) window.__renderGuild();
@@ -2931,7 +2961,7 @@
                         var t = new Date(l.ts);
                         function p(x) { return x < 10 ? "0" + x : x; }
                         var timeStr = (t.getMonth() + 1) + "-" + t.getDate() + " " + p(t.getHours()) + ":" + p(t.getMinutes());
-                        var cat = l.category === "gather" ? "采集" : "货运";
+                        var cat = l.category === "gather" ? "采集" : l.category === "treasure" ? "宝图" : "货运";
                         var oldV = (Number(l.old_price) || 0).toLocaleString("zh-CN");
                         var newV = (Number(l.new_price) || 0).toLocaleString("zh-CN");
                         return '<div class="admin-row admin-log">' +
@@ -2994,6 +3024,13 @@
             };
 
             /* ---------- 初始化 ---------- */
+            // 宝图残页单价变更 → 记录待同步（云端共享）
+            var treasureInput = document.getElementById("treasureMapPrice");
+            if (treasureInput) {
+                treasureInput.addEventListener("input", function () {
+                    window.__registerPendingTreasure(treasureInput.value);
+                });
+            }
             renderMemberBar();
             restoreSession();
             pullPrices();
