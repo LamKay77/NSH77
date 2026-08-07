@@ -1198,7 +1198,6 @@
                 </div>
 
                 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
-                    <button class="btn-sm" onclick="guildReset()">🔄 恢复默认配方</button>
                     <button class="btn-sm" id="guildLogBtn" onclick="toggleGuildLog()">📝 修改记录</button>
                 </div>
 
@@ -1215,7 +1214,6 @@
                                 <th style="width:155px;">材料③(可空)</th>
                                 <th style="width:70px;">售价</th>
                                 <th style="width:76px;text-align:right;">成本</th>
-                                <th style="width:38px;text-align:center;">操作</th>
                             </tr>
                         </thead>
                         <tbody id="guildTableBody"></tbody>
@@ -2366,8 +2364,7 @@
                         renderMatCell(i, it.mat2, "m2") +
                         renderMatCell(i, it.mat3, "m3") +
                         "<td class=\"sale-cell\" data-idx=\"" + i + "\" style=\"text-align:right;color:var(--primary-dark);font-weight:600;\">" + fmt(syncedSalePrice(it)) + "</td>" +
-                        "<td class=\"cost-cell\" data-cost=\"" + i + "\">" + fmt(costOf(it)) + "</td>" +
-                        "<td style=\"text-align:center;\"><button class=\"btn-icon\" data-del=\"" + i + "\" title=\"删除物品\">✕</button></td>";
+                        "<td class=\"cost-cell\" data-cost=\"" + i + "\">" + fmt(costOf(it)) + "</td>";
                     body.appendChild(tr);
                 });
                 // 只读单元格点击失焦（配方数据不可编辑）
@@ -2425,27 +2422,10 @@
                 refreshCostCells();
                 calcCraftsman();
             });
-            document.getElementById("guildTableBody").addEventListener("click", function (e) {
-                var btn = e.target.closest("button[data-del]");
-                if (!btn) return;
-                var idx = Number(btn.getAttribute("data-del"));
-                if (guildItems.length <= 1) { alert("至少保留 1 个物品"); return; }
-                guildItems.splice(idx, 1);
-                persistGuild();
-                renderGuildTable();
-                calcCraftsman();
-            });
+            // 已禁用：不允许用户删除配方
 
             window.guildAddItem = function () {
                 guildItems.push({ name: "新物品" + (guildItems.length + 1), stamina: 100, output: 1, chance: 0, mat1: { name: "材料甲", qty: 10, price: 500 }, mat2: { name: "", qty: 0, price: 0 }, mat3: null });
-                persistGuild();
-                renderGuildTable();
-                calcCraftsman();
-            };
-            window.guildReset = function () {
-                if (!confirm("确定恢复默认配方？当前修改将被覆盖。")) return;
-                guildItems = JSON.parse(JSON.stringify(DEFAULT_GUILD_ITEMS));
-                try { localStorage.removeItem(LOG_KEY); } catch (e) {}
                 persistGuild();
                 renderGuildTable();
                 calcCraftsman();
