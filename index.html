@@ -958,9 +958,8 @@
                     <table class="price-table">
                         <thead>
                             <tr>
-                                <th style="width:45%;">道具名称</th>
-                                <th style="width:40%;">单价（铜钱）</th>
-                                <th style="width:15%;text-align:center;">操作</th>
+                                <th style="width:50%;">道具名称</th>
+                                <th style="width:50%;">单价（铜钱）</th>
                             </tr>
                         </thead>
                         <tbody id="priceTableBody">
@@ -1171,9 +1170,8 @@
                     <table class="price-table">
                         <thead>
                             <tr>
-                                <th style="width:45%;">道具名称</th>
-                                <th style="width:40%;">单价（铜钱）</th>
-                                <th style="width:15%;text-align:center;">操作</th>
+                                <th style="width:50%;">道具名称</th>
+                                <th style="width:50%;">单价（铜钱）</th>
                             </tr>
                         </thead>
                         <tbody id="fullPriceTableBody">
@@ -1638,7 +1636,7 @@
                 }
             }
 
-            function buildPriceRowHTML(item, onlyOne) {
+            function buildPriceRowHTML(item) {
                 return `
                         <td>
                             <input type="text" class="item-name-input" value="${escapeHtml(item.name)}"
@@ -1647,15 +1645,10 @@
                         <td>
                             <input type="number" value="${item.price}" min="0" step="1"
                                 data-item-id="${item.id}" data-field="price" placeholder="单价" style="text-align:right;">
-                        </td>
-                        <td style="text-align:center;">
-                            <button class="btn-icon" title="删除道具" data-action="delete" data-item-id="${item.id}"
-                                ${onlyOne ? 'disabled style="opacity:0.3;cursor:not-allowed;"' : ''}>✕</button>
                         </td>`;
             }
             function bindPriceTableEvents(tableBody) {
                 tableBody.querySelectorAll('input').forEach(input => input.addEventListener('input', handlePriceInput));
-                tableBody.querySelectorAll('button[data-action="delete"]').forEach(btn => btn.addEventListener('click', handleDeleteItem));
             }
             // 首页：仅渲染订单引用到的道具（识别到的道具）
             function renderPriceTableDOM() {
@@ -1763,21 +1756,6 @@
                         if (window.__renamePendingFreight) window.__renamePendingFreight(oldName, newName);
                     }
                 }
-            }
-            function handleDeleteItem(e) {
-                const btn = e.target.closest('button');
-                if (!btn) return;
-                const itemId = btn.getAttribute('data-item-id');
-                if (items.length <= 1) return;
-                const deleted = items.find(it => it.id === itemId);
-                items = items.filter(it => it.id !== itemId);
-                orders.forEach(o => { if (o.itemName === deleted.name) o.itemName = items[0].name; });
-                if (window.__removePendingFreight) window.__removePendingFreight(deleted.name);
-                renderPriceTableDOM();
-                renderFullPriceTableDOM();
-                renderOrderListDOM();
-                updateResults();
-                if (window.refreshGuildSales) window.refreshGuildSales();
             }
             function handleOrderInput(e) {
                 const el = e.target;
@@ -2730,7 +2708,7 @@
                 var n = Object.keys(pendingFreight).length + Object.keys(pendingGather).length + (pendingTreasure ? 1 : 0);
                 var btn = document.getElementById("syncBtn");
                 if (btn) {
-                    btn.textContent = n > 0 ? "☁️ 同步价格 (" + n + ")" : "☁️ 同步价格";
+                    btn.textContent = n > 0 ? "☁️ 同步价格到云端 (" + n + ")" : "☁️ 同步价格到云端";
                     btn.style.background = n > 0 ? "linear-gradient(135deg,#f7b8ad,#e89284)" : "";
                 }
                 var hint = document.getElementById("syncHint");
@@ -2756,7 +2734,7 @@
                     var lvText = currentUser.level === 3 ? "管理员" : currentUser.level === 2 ? "高级会员" : "普通会员";
                     status.innerHTML = "👤 " + esc(currentUser.username) + ' · <span class="lv-tag lv-' + currentUser.level + '">Lv' + currentUser.level + ' ' + lvText + '</span>';
                     var html = '<button class="btn-sm" onclick="NSH.doSign()">📅 签到</button>';
-                    if (currentUser.level >= 2) html += '<button class="btn-sm primary" id="syncBtn" onclick="NSH.syncPrices()">☁️ 同步价格</button>';
+                    if (currentUser.level >= 2) html += '<button class="btn-sm primary" id="syncBtn" onclick="NSH.syncPrices()">☁️ 同步价格到云端</button>';
                     if (currentUser.level >= 3) html += '<button class="btn-sm" onclick="NSH.openAdmin()">🛡️ 管理</button>';
                     html += '<button class="btn-sm" onclick="NSH.logout()">退出</button>';
                     actions.innerHTML = html;
