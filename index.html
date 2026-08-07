@@ -2681,7 +2681,7 @@
             // TODO: 将 API_BASE 替换为你的 Cloudflare Worker 域名（与 OCR 同一个 Worker）
             var API_BASE = "https://nsh-ocr-proxy.sinpne5.workers.dev";
             var TOKEN_KEY = "nsh_token_v1";
-            var POLL_MS = 30000; // 每 30 秒自动拉取一次云端价格
+            var POLL_MS = 600000; // 每 10 分钟自动拉取一次云端价格
 
             var currentUser = null;
             var pendingFreight = {}; // name -> { price, updated_at }
@@ -2817,10 +2817,13 @@
             }
 
             /* ---------- 拉取云端价格（所有人，每 30 秒） ---------- */
+            var lastSince = 0; // 云端最新更新时间戳，用于增量拉取
             async function pullPrices() {
                 try {
-                    var data = await api("/api/prices", "GET");
+                    var q = lastSince ? "?since=" + lastSince : "";
+                    var data = await api("/api/prices" + q, "GET");
                     if (!data || !data.ok) return false;
+                    if (typeof data.since === "number" && data.since > lastSince) lastSince = data.since;
                     var changed = false;
                     (data.freight || []).forEach(function (p) {
                         if (pendingFreight[p.name]) return; // 本地有未同步修改，避免被覆盖
@@ -2840,6 +2843,27 @@
                     return false;
                 }
             }
+
+            /* ---------- 轮询控制：失焦暂停，回前台立即拉取 ---------- */
+            var pollTimer = null;
+            function startPolling() {
+                stopPolling();
+                pollTimer = setInterval(pullPrices, POLL_MS);
+            }
+            function stopPolling() {
+                if (pollTimer) {
+                    clearInterval(pollTimer);
+                    pollTimer = null;
+                }
+            }
+            document.addEventListener("visibilitychange", function () {
+                if (document.hidden) {
+                    stopPolling();
+                } else {
+                    pullPrices(); // 回前台立即拉一次，避免错过变更
+                    startPolling();
+                }
+            });
 
             /* ---------- 上传本地价格到云端（高级会员，手动确认） ---------- */
             function syncPrices() {
@@ -2993,7 +3017,7 @@
             renderMemberBar();
             restoreSession();
             pullPrices();
-            setInterval(pullPrices, POLL_MS);
+            startPolling();
         })();
     </script>
 </body>
