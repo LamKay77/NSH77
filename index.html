@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>逆水寒助手</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=ZCOOL+KuaiLe&display=swap');
+        @import url('https://fonts.googleapis.cn/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@500;700;900&family=Ma+Shan+Zheng&family=ZCOOL+KuaiLe&display=swap');
 
         :root {
             --bg: #e9f3fb;
@@ -859,10 +859,255 @@
         .admin-log .new { color: var(--success); font-weight: 600; }
         .admin-log .log-time { color: var(--text-secondary); font-size: 0.74rem; white-space: nowrap; }
     </style>
+<!-- ===================== 设计层 · 地中海水色（柔和·白为主调）主题 ===================== -->
+<!-- 原文件全部使用 CSS 变量，重写 :root 即可整体换色；本层叠加在上方，不改动任何逻辑/ID -->
+<style>
+:root {
+  --bg: #eef5f4;
+  --bg-top: #f7fbfa;
+  --card-bg: #ffffff;
+  --primary: #4f9d97;
+  --primary-dark: #357e79;
+  --primary-light: #d4ebe8;
+  --accent: #d9a06a;
+  --soft-blue: #e8f3f1;
+  --blue-border: #dcebe9;
+  --cinnabar: #d98b7a;
+  --text: #2f3d3e;
+  --text-secondary: #7c8b8b;
+  --border: #e3edec;
+  --border-light: #f1f6f5;
+  --danger: #d98b7a;
+  --danger-bg: #fbeeec;
+  --success: #4f9d97;
+  --success-bg: #e8f3f0;
+  --info: #4f9d97;
+  --info-bg: #e8f3f1;
+  --gold-bg: #fbf3e6;
+  --gold-border: #ecd9b4;
+  --shadow-sm: 0 2px 10px rgba(40,75,75,0.06);
+  --shadow-md: 0 12px 32px rgba(40,75,75,0.10);
+  --shadow-lg: 0 20px 52px rgba(40,75,75,0.14);
+  --radius-sm: 12px;
+  --radius: 18px;
+  --radius-lg: 26px;
+  --font-display: "Noto Serif SC", "Ma Shan Zheng", serif;
+}
+
+body {
+  font-family: "Noto Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  padding: 0;
+  line-height: 1.7;
+}
+
+/* 氛围背景：水色底色 + 海岸照片（加载失败则仅显示底色，优雅降级） */
+.bg-deco {
+  background:
+    linear-gradient(180deg, rgba(247,251,250,0.85) 0%, rgba(238,245,244,0.92) 100%),
+    url("https://images.unsplash.com/photo-1505226752298-1d7c1c0a3f5e?auto=format&fit=crop&w=1600&q=80") center/cover no-repeat fixed;
+}
+
+/* 内容区让出左侧导航 */
+.container {
+  max-width: none;
+  margin: 0 40px 0 260px;
+  padding-top: 22px;
+  padding-bottom: 40px;
+}
+
+/* 顶部照片横幅（无版权 · Unsplash） */
+.hero-banner {
+  position: relative;
+  margin: 0 0 22px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  min-height: 188px;
+  display: flex;
+  align-items: flex-end;
+  padding: 26px 32px;
+  color: #fff;
+  background-color: #357e79;
+  background-image:
+    linear-gradient(180deg, rgba(79,157,151,0.12) 0%, rgba(53,126,121,0.60) 100%),
+    url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80");
+  background-size: cover;
+  background-position: center;
+  box-shadow: var(--shadow-md);
+}
+.hero-banner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(40,75,75,0.34), transparent 55%);
+}
+.hero-banner .hero-text { position: relative; z-index: 1; }
+.hero-banner .hero-kicker { font-size: .78rem; letter-spacing: 3px; opacity: .9; }
+.hero-banner .hero-title { font-family: "Ma Shan Zheng","Noto Serif SC",serif; font-size: 1.9rem; margin: 4px 0 4px; text-shadow: 0 2px 10px rgba(0,0,0,.25); }
+.hero-banner .hero-sub { font-size: .92rem; opacity: .92; }
+
+/* 标题字体：书法/宋体，凸显国风 */
+.header h1, .seal-logo span, .hero-title { font-family: "Ma Shan Zheng","Noto Serif SC",serif; }
+.card-header h2, .nav-name, .strip-title { font-family: "Noto Serif SC",serif; font-weight: 700; }
+
+.seal-logo {
+  background: linear-gradient(135deg, #5bb3ac 0%, #357e79 100%);
+  box-shadow: 0 8px 18px rgba(79,157,151,0.30);
+}
+.header h1 { font-size: 2.2rem; letter-spacing: 2px; color: var(--text); }
+.subtitle { color: var(--text-secondary); }
+.author-badge { background: var(--gold-bg); color: #9a7b2e; border: 1px solid var(--gold-border); }
+
+/* 左侧导航栏 */
+.tab-bar {
+  position: fixed;
+  top: 0; left: 0;
+  width: 236px; height: 100vh;
+  display: flex; flex-direction: column;
+  gap: 6px;
+  padding: 22px 14px;
+  margin: 0;
+  border: none;
+  border-right: 1px solid var(--border);
+  background: linear-gradient(180deg, #ffffff 0%, #f1f8f6 100%);
+  box-shadow: 4px 0 24px rgba(40,75,75,0.08);
+  z-index: 50;
+}
+.nav-brand {
+  display: flex; align-items: center; gap: 11px;
+  color: var(--text);
+  padding: 2px 10px 16px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.nav-brand .nav-seal {
+  width: 40px; height: 40px; border-radius: 12px;
+  background: linear-gradient(135deg, #5bb3ac 0%, #357e79 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-family: "Ma Shan Zheng",serif; font-size: 23px; color: #fff;
+  flex-shrink: 0;
+}
+.nav-brand .nav-name { font-size: 1.05rem; line-height: 1.2; color: var(--text); }
+.nav-brand .nav-tag { font-size: .7rem; color: var(--text-secondary); margin-top: 2px; }
+.tab-btn {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; text-align: left;
+  padding: 12px 14px;
+  border: none; border-radius: 12px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: .92rem; font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.tab-btn:hover { background: var(--soft-blue); color: var(--primary-dark); }
+.tab-btn.active {
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+/* 卡片与基础件微调 */
+.card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card-bg);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow .25s ease, transform .25s ease;
+}
+.card:hover { box-shadow: var(--shadow-md); }
+.btn-sm.primary, .btn-sm {
+  border-radius: 10px;
+  transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
+}
+.btn-sm.primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(79,157,151,0.30); }
+.tag { border-radius: 999px; }
+
+/* 底部照片条 */
+.photo-strip {
+  position: relative;
+  margin: 28px 0 0;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  min-height: 140px;
+  display: flex; align-items: center;
+  padding: 22px 30px;
+  color: #fff;
+  background-color: #357e79;
+  background-image:
+    linear-gradient(90deg, rgba(53,126,121,0.72), rgba(53,126,121,0.18)),
+    url("https://images.unsplash.com/photo-1471922694854-ff1b63b20054?auto=format&fit=crop&w=1400&q=80");
+  background-size: cover; background-position: center;
+  box-shadow: var(--shadow-md);
+}
+.photo-strip .strip-title { font-size: 1.25rem; }
+.photo-strip .strip-sub { font-size: .85rem; opacity: .9; margin-top: 4px; }
+
+/* 响应式：窄屏导航回到顶部 */
+  @media (max-width: 920px) {
+  .tab-bar {
+    position: static; width: auto; height: auto;
+    flex-direction: row; flex-wrap: wrap;
+    border-radius: 0; padding: 10px;
+    background: linear-gradient(90deg, #ffffff, #f1f8f6);
+  }
+  .nav-brand { width: 100%; border-bottom: none; padding-bottom: 8px; margin-bottom: 4px; }
+  .tab-btn { width: auto; flex: 1 1 auto; justify-content: center; }
+  .tab-btn.active { box-shadow: inset 0 -3px 0 var(--accent); }
+  .container { margin: 0 12px; max-width: none; }
+  .hero-banner { min-height: 150px; }
+}
+
+/* 移动端货运订单栏位换行，防止字体/输入框溢出 */
+@media (max-width: 640px) {
+  .hero-banner { padding: 18px 22px; min-height: 120px; }
+  .hero-banner .hero-title { font-size: 1.45rem; }
+  .hero-banner .hero-sub { font-size: 0.85rem; }
+  .card { padding: 16px 14px; }
+  .order-row { flex-wrap: wrap; gap: 8px 6px; padding: 12px; }
+  .order-row select { flex: 1 1 calc(100% - 40px); min-width: 0; font-size: 0.82rem; }
+  .order-row .qty-input, .order-row .reward-input { flex: 0 0 64px; min-width: 56px; font-size: 0.82rem; }
+  .order-row .inline-label { font-size: 0.68rem; }
+  .order-summary-mini { flex: 1 1 100%; min-width: 0; margin-top: 2px; }
+}
+
+/* 工匠采集表横向滚动提示与移动端优化 */
+.guild-table-wrap {
+  position: relative;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-light) var(--border-light);
+}
+.guild-table-wrap::-webkit-scrollbar { height: 8px; }
+.guild-table-wrap::-webkit-scrollbar-thumb { background: var(--primary-light); border-radius: 4px; border: 2px solid var(--border-light); }
+.guild-table-wrap::-webkit-scrollbar-track { background: var(--border-light); }
+@media (max-width: 640px) {
+  .guild-table-wrap::before {
+    content: "← 左右滑动查看完整数据 →";
+    display: block;
+    text-align: center;
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    padding: 4px 0 8px;
+  }
+  .guild-table { font-size: 0.72rem; }
+  .guild-table th { font-size: 0.66rem; }
+  .guild-table input { font-size: 0.72rem; padding: 4px 5px; }
+}
+</style>
 </head>
 <body>
     <div class="bg-deco"></div>
     <div class="container">
+        <!-- 照片横幅（无版权 · Unsplash） -->
+        <div class="hero-banner">
+            <div class="hero-text">
+                <div class="hero-kicker">江湖货运 · 帮会收益参谋</div>
+                <div class="hero-title">运筹江湖 · 收益了然</div>
+                <div class="hero-sub">订单精准核算 · 最佳提交策略 · 一键云端共享</div>
+            </div>
+        </div>
         <!-- Header -->
         <div class="header">
             <div class="seal-logo"><span>逆</span></div>
@@ -882,6 +1127,13 @@
 
         <!-- ===== 标签页导航 ===== -->
         <nav class="tab-bar" id="mainTabBar">
+            <div class="nav-brand">
+                <div class="nav-seal">逆</div>
+                <div>
+                    <div class="nav-name">逆水寒助手</div>
+                    <div class="nav-tag">收益精算 · by Vasuki</div>
+                </div>
+            </div>
             <button class="tab-btn active" data-tab="freight" onclick="switchTab('freight')">🚚 货运收益计算</button>
             <button class="tab-btn" data-tab="craftsman" onclick="switchTab('craftsman')">⚒️ 生活利润计算</button>
             <button class="tab-btn" data-tab="prices" onclick="switchTab('prices')">📦 货运道具价格</button>
@@ -1330,6 +1582,12 @@
             </div>
         </div>
 
+        <div class="photo-strip">
+            <div>
+                <div class="strip-title">山水有相逢 · 收益无止境</div>
+                <div class="strip-sub">数据本地优先，会员云端共享 · 截图识别即算</div>
+            </div>
+        </div>
         <div class="footer">
             逆水寒帮会货运收益计算工具 &nbsp;•&nbsp; Designed & Developed by <strong>Vasuki</strong>
         </div>
