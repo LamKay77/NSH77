@@ -883,6 +883,49 @@
         .admin-log .old { color: var(--danger); text-decoration: line-through; }
         .admin-log .new { color: var(--success); font-weight: 600; }
         .admin-log .log-time { color: var(--text-secondary); font-size: 0.74rem; white-space: nowrap; }
+        .guide-block { margin: 14px 0; padding: 14px 16px; background: var(--soft-blue); border: 1px solid var(--blue-border); border-radius: var(--radius-sm); }
+        .guide-block h3 { margin: 0 0 6px; font-size: 0.98rem; color: var(--primary-dark); }
+        .guide-block ul { margin: 6px 0; padding-left: 20px; }
+        .guide-block li { margin: 5px 0; font-size: 0.88rem; line-height: 1.7; }
+        .guide-block a { color: var(--primary-dark); font-weight: 600; text-decoration: underline; cursor: pointer; }
+        .guide-block a:hover { color: var(--accent); }
+        .mode-modal { width: 380px; max-width: 100%; text-align: center; }
+        .mode-modal h3 { margin-bottom: 4px; }
+        .mode-sub { color: var(--text-secondary); font-size: 0.85rem; margin: 0 0 16px; }
+        .mode-options { display: flex; flex-direction: column; gap: 12px; }
+        .mode-option {
+            display: flex; align-items: center; gap: 10px; text-align: left;
+            padding: 14px 16px; border: 1.5px solid var(--blue-border); border-radius: var(--radius);
+            background: var(--soft-blue); cursor: pointer; transition: all .2s; font-family: inherit;
+        }
+        .mode-option:hover { border-color: var(--primary); background: var(--primary-light); transform: translateY(-1px); }
+        .mode-option .mode-emoji { font-size: 1.5rem; flex-shrink: 0; }
+        .mode-option .mode-title { font-size: 0.95rem; font-weight: 600; color: var(--primary-dark); display: block; }
+        .mode-option .mode-desc { font-size: 0.78rem; color: var(--text-secondary); display: block; margin-top: 2px; }
+        .mode-guide { margin-top: 14px; font-size: 0.85rem; }
+        .mode-guide a { color: var(--primary-dark); font-weight: 600; text-decoration: underline; cursor: pointer; }
+        .mode-switch-bar {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 10px 12px; border-bottom: 1px solid var(--border-light);
+        }
+        .ms-label { font-size: 0.72rem; color: var(--text-secondary); white-space: nowrap; }
+        .switch { position: relative; display: inline-block; width: 46px; height: 26px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; inset: 0;
+            background: #cfd8d6; border-radius: 26px; transition: .3s;
+        }
+        .slider:before {
+            content: ""; position: absolute; height: 20px; width: 20px; left: 3px; bottom: 3px;
+            background: #fff; border-radius: 50%; transition: .3s; box-shadow: 0 1px 3px rgba(0,0,0,.25);
+        }
+        .switch input:checked + .slider { background: var(--primary); }
+        .switch input:checked + .slider:before { transform: translateX(20px); }
+        .mode-actions {
+            display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+            padding: 10px 12px; border-bottom: 1px solid var(--border-light);
+        }
+        .mode-actions .btn-sm { padding: 5px 10px; font-size: 0.75rem; }
     </style>
 <!-- ===================== 设计层 · 地中海水色（柔和·白为主调）主题 ===================== -->
 <!-- 原文件全部使用 CSS 变量，重写 :root 即可整体换色；本层叠加在上方，不改动任何逻辑/ID -->
@@ -1196,11 +1239,27 @@ body {
                     <div class="nav-tag">收益精算 · by Vasuki</div>
                 </div>
             </div>
+            <!-- 价格模式开关 -->
+            <div class="mode-switch-bar">
+                <span class="ms-label">🗒️ 空白</span>
+                <label class="switch" title="空白模式：所有价格为0，手动填写">
+                    <input type="checkbox" id="modeToggle" onchange="NSH.toggleMode()">
+                    <span class="slider"></span>
+                </label>
+                <span class="ms-label">☁️ 云端</span>
+            </div>
+            <!-- 价格存档（导出 / 导入） -->
+            <div class="mode-actions">
+                <button class="btn-sm" onclick="NSH.exportPrices()" title="将当前价格导出为存档文件">📤 导出价格</button>
+                <button class="btn-sm" onclick="NSH.importPrices()" title="从存档文件导入价格">📥 导入价格</button>
+            </div>
+            <input type="file" id="priceImportInput" accept=".json,application/json" style="display:none;">
             <button class="tab-btn active" data-tab="freight" onclick="switchTab('freight')">🚚 货运收益计算</button>
             <button class="tab-btn" data-tab="craftsman" onclick="switchTab('craftsman')">⚒️ 生活利润计算</button>
             <button class="tab-btn" data-tab="prices" onclick="switchTab('prices')">📦 货运道具价格</button>
             <button class="tab-btn" data-tab="price" onclick="switchTab('price')">📊 工匠采集价格</button>
             <button class="tab-btn" data-tab="auction" onclick="switchTab('auction')">🎯 拍卖计算器</button>
+            <button class="tab-btn" data-tab="guide" onclick="switchTab('guide')">📖 使用说明</button>
         </nav>
 
         <!-- ===== 面板一：货运收益计算 ===== -->
@@ -1644,6 +1703,55 @@ body {
             </div>
         </div>
 
+        <!-- ===== 使用说明面板 ===== -->
+        <div class="tab-panel" id="panel-guide" style="display:none;">
+            <div class="card card--blue">
+                <div class="card-header">
+                    <span class="badge badge-module1">📖</span>
+                    <h2>使用说明</h2>
+                    <span class="hint">价格同步用户指南</span>
+                </div>
+
+                <div class="guide-block">
+                    <h3>一、价格入口</h3>
+                    <ul>
+                        <li><a href="javascript:;" onclick="switchTab('prices')">📦 货运道具价格</a>：维护全部货运道具成本价，修改后自动同步首页。</li>
+                        <li><a href="javascript:;" onclick="switchTab('price')">⚒️ 工匠采集价格</a>：维护采集材料出售价与双倍概率。</li>
+                        <li><a href="javascript:;" onclick="gotoSection('freight','module1')">🗺️ 宝图残页</a>：设置宝图残页单价（拍卖行售价，实际到手 95%）。</li>
+                    </ul>
+                </div>
+
+                <div class="guide-block">
+                    <h3>二、价格同步机制</h3>
+                    <ul>
+                        <li>登录会员均可<strong>本地改价</strong>，修改仅自己可见，并累计为「待同步」。</li>
+                        <li><strong>高级会员</strong>点顶部「☁️ 同步价格到云端」即可上传共享。</li>
+                        <li>全员每 30 秒自动拉取云端最新价格，无需手动刷新。</li>
+                        <li>云端有冲突保护：新价格不会被旧数据覆盖。</li>
+                    </ul>
+                </div>
+
+                <div class="guide-block">
+                    <h3>三、会员等级</h3>
+                    <ul>
+                        <li><span class="lv-tag lv-1">Lv1</span> 普通会员：本地改价、每日签到。</li>
+                        <li><span class="lv-tag lv-2">Lv2</span> 高级会员：可上传价格共享云端。</li>
+                        <li><span class="lv-tag lv-3">Lv3</span> 管理员：会员管理、封禁 / 升降级、改价日志。</li>
+                    </ul>
+                    <p style="margin-top:6px;">升级方式：每日签到累计 <b>7 天</b>自动升为高级会员，或联系管理员手动升级。</p>
+                </div>
+
+                <div class="guide-block">
+                    <h3>四、常见问题</h3>
+                    <ul>
+                        <li>提示「普通会员无法同步」？累计签到 7 天，或联系管理员升级。</li>
+                        <li>同步后部分价格没变化？云端有更新版本时系统自动采用最新值，属正常机制。</li>
+                        <li>双倍概率刷新后恢复默认？双倍概率仅保存在本机，不参与云端同步。</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
         <!-- 梵高《花田》分隔带 -->
         <div class="vangogh-divider">
             <div class="vd-center">
@@ -1701,6 +1809,33 @@ body {
             <div class="admin-list" id="adminLogs" style="display:none;"></div>
             <div style="text-align:center;margin-top:14px;">
                 <button type="button" class="btn-sm" onclick="document.getElementById('adminOverlay').style.display='none'">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模式选择弹窗（首次进入） -->
+    <div class="auth-overlay" id="modeOverlay">
+        <div class="auth-modal mode-modal">
+            <h3>🏮 欢迎使用逆水寒助手</h3>
+            <p class="mode-sub">请选择你的价格使用模式：</p>
+            <div class="mode-options">
+                <button type="button" class="mode-option" onclick="NSH.chooseMode('blank')">
+                    <span class="mode-emoji">🗒️</span>
+                    <span>
+                        <span class="mode-title">空白模式</span>
+                        <span class="mode-desc">所有价格均未填写，由你手动输入</span>
+                    </span>
+                </button>
+                <button type="button" class="mode-option" onclick="NSH.chooseMode('cloud')">
+                    <span class="mode-emoji">☁️</span>
+                    <span>
+                        <span class="mode-title">云端价格模式</span>
+                        <span class="mode-desc">无需手动输入价格，可能存在价格误差</span>
+                    </span>
+                </button>
+            </div>
+            <div class="mode-guide">
+                <a href="javascript:;" onclick="NSH.openGuide()">📖 使用说明</a>
             </div>
         </div>
     </div>
@@ -2410,6 +2545,42 @@ body {
                 return true;
             };
 
+            /* ---------- 模式切换 / 价格存档钩子（供会员系统脚本调用） ---------- */
+            window.__getFreightData = function () { return JSON.parse(JSON.stringify(items)); };
+            window.__getTreasurePrice = function () { return Math.max(0, Math.floor(Number(treasureMapPriceInput.value) || 0)); };
+            window.__importFreightData = function (list) {
+                if (!Array.isArray(list) || !list.length) return false;
+                items = list.map(function (it) {
+                    return {
+                        id: (it && it.id) || ("item_" + (itemIdCounter++)),
+                        name: String((it && it.name) || ""),
+                        price: Math.max(0, Math.floor(Number((it && it.price) || 0)))
+                    };
+                });
+                return true;
+            };
+            window.__setTreasurePrice = function (v) {
+                treasureMapPriceInput.value = Math.max(0, Math.floor(Number(v) || 0));
+                orders.forEach(o => updateSingleOrderDisplay(o.id));
+                updateResults();
+            };
+            window.__zeroFreight = function () {
+                items.forEach(function (it) { it.price = 0; });
+                treasureMapPriceInput.value = 0;
+                if (window.__clearPendingFreight) window.__clearPendingFreight();
+                if (window.__clearPendingTreasure) window.__clearPendingTreasure();
+                renderPriceTableDOM();
+                renderFullPriceTableDOM();
+                renderOrderListDOM();
+                updateResults();
+                if (window.refreshGuildSales) window.refreshGuildSales();
+            };
+            window.__restoreFreight = function () {
+                resetDefaultItems();
+                if (window.__clearPendingFreight) window.__clearPendingFreight();
+                if (window.__clearPendingTreasure) window.__clearPendingTreasure();
+            };
+
             renderPriceTableDOM();
             renderFullPriceTableDOM();
             renderOrderListDOM();
@@ -2793,6 +2964,64 @@ body {
             window.__renderGuild = function () {
                 renderGatherTable();
                 renderGuildTable();
+                renderFixedMatTable();
+                refreshCostCells();
+                calcCraftsman();
+            };
+
+            /* ---------- 模式切换 / 价格存档钩子（供会员系统脚本调用） ---------- */
+            window.__getGatherData = function () { return JSON.parse(JSON.stringify(gatherInfo)); };
+            window.__getFixedMatsData = function () { return JSON.parse(JSON.stringify(fixedMats)); };
+            window.__importGatherData = function (obj) {
+                if (!obj || typeof obj !== "object") return false;
+                var merged = Object.assign({}, DEFAULT_GATHER);
+                Object.keys(obj).forEach(function (n) {
+                    var v = obj[n];
+                    if (v && typeof v === "object") {
+                        merged[n] = {
+                            stamina: Math.max(0, Math.floor(Number(v.stamina) || 0)),
+                            qty: Math.max(0, Math.floor(Number(v.qty) || 0)),
+                            chance: Math.max(0, Math.floor(Number(v.chance) || 0)),
+                            price: Math.max(0, Math.floor(Number(v.price) || 0))
+                        };
+                    }
+                });
+                gatherInfo = merged;
+                saveGather();
+                return true;
+            };
+            window.__importFixedMatsData = function (obj) {
+                if (!obj || typeof obj !== "object") return false;
+                var merged = Object.assign({}, DEFAULT_FIXED_MATS);
+                Object.keys(obj).forEach(function (n) {
+                    var v = Number(obj[n]);
+                    if (!isNaN(v)) merged[n] = Math.max(0, Math.floor(v));
+                });
+                fixedMats = merged;
+                saveFixedMats();
+                return true;
+            };
+            window.__zeroGather = function () {
+                Object.keys(gatherInfo).forEach(function (n) { gatherInfo[n].price = 0; gatherInfo[n].chance = 0; });
+                Object.keys(fixedMats).forEach(function (n) { fixedMats[n] = 0; });
+                guildItems.forEach(function (g) { g.chance = 0; });
+                saveGather();
+                saveFixedMats();
+                renderGatherTable();
+                renderGuildTable();
+                renderFixedMatTable();
+                refreshCostCells();
+                calcCraftsman();
+            };
+            window.__restoreGather = function () {
+                gatherInfo = Object.assign({}, DEFAULT_GATHER);
+                fixedMats = Object.assign({}, DEFAULT_FIXED_MATS);
+                saveGather();
+                saveFixedMats();
+                applyDefaultChances();
+                renderGatherTable();
+                renderGuildTable();
+                renderFixedMatTable();
                 refreshCostCells();
                 calcCraftsman();
             };
@@ -2944,6 +3173,15 @@ body {
                 window.scrollTo({ top: 0, behavior: "smooth" });
             };
 
+            /* 使用说明中的关联跳转：切页后滚动到指定区域 */
+            window.gotoSection = function (tab, elId) {
+                switchTab(tab);
+                setTimeout(function () {
+                    var el = document.getElementById(elId);
+                    if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+                }, 250);
+            };
+
             /* ================= 初始化 ================= */
             renderGuildTable();
             renderFixedMatTable();
@@ -3031,6 +3269,7 @@ body {
             window.__removePendingFreight = function (name) { delete pendingFreight[name]; refreshSyncBadge(); };
             window.__clearPendingFreight = function () { pendingFreight = {}; refreshSyncBadge(); };
             window.__clearPendingTreasure = function () { pendingTreasure = null; refreshSyncBadge(); };
+            window.__clearPendingGather = function () { pendingGather = {}; refreshSyncBadge(); };
 
             function refreshSyncBadge() {
                 var n = Object.keys(pendingFreight).length + Object.keys(pendingGather).length + (pendingTreasure ? 1 : 0);
@@ -3041,9 +3280,13 @@ body {
                 }
                 var hint = document.getElementById("syncHint");
                 if (hint) {
-                    hint.innerHTML = n > 0
-                        ? ("⚠️ 有 <b>" + n + "</b> 项本地价格修改尚未同步（仅高级会员可上传共享）")
-                        : "☁️ 云端价格共享：高级会员上传后，全员每 30 秒自动拉取最新价格";
+                    if (getMode() === "blank") {
+                        hint.innerHTML = "🗒️ 空白模式：所有价格与双倍爆率均为 0，可手动填写或导入存档";
+                    } else if (n > 0) {
+                        hint.innerHTML = "⚠️ 有 <b>" + n + "</b> 项本地价格修改尚未同步（仅高级会员可上传共享）";
+                    } else {
+                        hint.innerHTML = "☁️ 云端价格共享：高级会员上传后，全员每 30 秒自动拉取最新价格";
+                    }
                 }
             }
             window.__onSyncCountChange = refreshSyncBadge;
@@ -3329,6 +3572,109 @@ body {
                 adminLevel: adminLevel
             };
 
+            /* ---------- 模式选择（首次进入弹窗 + 侧边栏开关） ---------- */
+            var MODE_KEY = "nsh_mode_v1";
+            function getMode() { try { return localStorage.getItem("nsh_mode_v1") || ""; } catch (e) { return ""; } }
+            function setMode(m) { try { localStorage.setItem("nsh_mode_v1", m); } catch (e) {} }
+            function updateModeSwitch() {
+                var toggle = document.getElementById("modeToggle");
+                if (toggle) toggle.checked = getMode() === "cloud";
+            }
+            function applyMode(mode) {
+                if (mode === "blank") {
+                    // 空白模式：所有价格归零、双倍爆率归零，不拉取云端
+                    stopPolling();
+                    if (window.__clearPendingGather) window.__clearPendingGather();
+                    if (window.__zeroFreight) window.__zeroFreight();
+                    if (window.__zeroGather) window.__zeroGather();
+                    var h = document.getElementById("syncHint");
+                    if (h) h.innerHTML = "🗒️ 空白模式：所有价格与双倍爆率均为 0，可手动填写或导入存档";
+                } else {
+                    // 云端价格模式：恢复默认价后拉取云端最新价
+                    if (window.__clearPendingGather) window.__clearPendingGather();
+                    if (window.__restoreFreight) window.__restoreFreight();
+                    if (window.__restoreGather) window.__restoreGather();
+                    pullPrices();
+                    startPolling();
+                }
+                updateModeSwitch();
+                refreshSyncBadge();
+            }
+            window.NSH.chooseMode = function (mode) {
+                setMode(mode);
+                document.getElementById("modeOverlay").style.display = "none";
+                applyMode(mode);
+            };
+            window.NSH.toggleMode = function () {
+                var toggle = document.getElementById("modeToggle");
+                var mode = toggle && toggle.checked ? "cloud" : "blank";
+                setMode(mode);
+                document.getElementById("modeOverlay").style.display = "none";
+                applyMode(mode);
+            };
+            window.NSH.openGuide = function () {
+                document.getElementById("modeOverlay").style.display = "none";
+                switchTab("guide");
+            };
+
+            /* ---------- 价格存档（导出 / 导入） ---------- */
+            function buildBackup() {
+                return {
+                    version: 1,
+                    exported_at: new Date().toISOString(),
+                    treasure_map_price: window.__getTreasurePrice ? window.__getTreasurePrice() : 0,
+                    items: window.__getFreightData ? window.__getFreightData() : [],
+                    gather: window.__getGatherData ? window.__getGatherData() : {},
+                    fixed_mats: window.__getFixedMatsData ? window.__getFixedMatsData() : {}
+                };
+            }
+            window.NSH.exportPrices = function () {
+                var data = buildBackup();
+                var blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+                var url = URL.createObjectURL(blob);
+                var a = document.createElement("a");
+                a.href = url;
+                var d = new Date();
+                function p(x) { return x < 10 ? "0" + x : x; }
+                a.download = "nsh-price-backup-" + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + "-" + p(d.getHours()) + p(d.getMinutes()) + ".json";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                alert("✅ 已导出价格存档：道具 " + data.items.length + " 项、采集 " + Object.keys(data.gather).length + " 项、固定材料 " + Object.keys(data.fixed_mats).length + " 项。");
+            };
+            window.NSH.importPrices = function () {
+                document.getElementById("priceImportInput").click();
+            };
+            (function () {
+                var fileInput = document.getElementById("priceImportInput");
+                if (!fileInput) return;
+                fileInput.addEventListener("change", function () {
+                    var file = fileInput.files && fileInput.files[0];
+                    fileInput.value = "";
+                    if (!file) return;
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        try {
+                            var data = JSON.parse(e.target.result);
+                            if (!data || typeof data !== "object" || !data.version) throw new Error("存档格式无效");
+                            var ok = true;
+                            if (Array.isArray(data.items) && window.__importFreightData) ok = window.__importFreightData(data.items) && ok;
+                            if (data.gather && typeof data.gather === "object" && window.__importGatherData) ok = window.__importGatherData(data.gather) && ok;
+                            if (data.fixed_mats && typeof data.fixed_mats === "object" && window.__importFixedMatsData) ok = window.__importFixedMatsData(data.fixed_mats) && ok;
+                            if (typeof data.treasure_map_price === "number" && window.__setTreasurePrice) window.__setTreasurePrice(data.treasure_map_price);
+                            if (window.__renderFreight) window.__renderFreight();
+                            if (window.__renderGuild) window.__renderGuild();
+                            refreshSyncBadge();
+                            alert(ok ? "✅ 价格存档导入成功！" : "⚠️ 部分数据导入失败，请检查存档文件。");
+                        } catch (err) {
+                            alert("❌ 导入失败：" + (err.message || "文件格式错误"));
+                        }
+                    };
+                    reader.readAsText(file);
+                });
+            })();
+
             /* ---------- 初始化 ---------- */
             // 宝图残页单价变更 → 记录待同步（云端共享）
             var treasureInput = document.getElementById("treasureMapPrice");
@@ -3339,8 +3685,15 @@ body {
             }
             renderMemberBar();
             restoreSession();
-            pullPrices();
-            startPolling();
+            var savedMode = getMode();
+            if (savedMode === "blank") {
+                applyMode("blank");
+            } else if (savedMode === "cloud") {
+                applyMode("cloud");
+            } else {
+                // 首次使用：弹出模式选择弹窗，暂不拉取云端价格
+                document.getElementById("modeOverlay").style.display = "flex";
+            }
         })();
     </script>
 </body>
