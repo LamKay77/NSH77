@@ -1470,6 +1470,7 @@ body {
 
                 <div class="section-note">
                     💡 物品与成本数据来自「工匠采集价格」；双倍概率一律以制作表中的设置为准，已扣除 <strong>5% 手续费</strong>。
+                    带 <strong>⚠️ 未填售价</strong> 标记的成品/材料会排在最后，补填售价后自动参与排序。
                     <button class="btn-sm" style="margin-left:8px;" onclick="switchTab('price')">⚒️ 去维护制作表</button>
                 </div>
 
@@ -1477,7 +1478,7 @@ body {
                     <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;">
                         <div style="flex:1;min-width:140px;">
                             <label style="color:var(--primary-dark);font-weight:500;">💪 输入现有体力</label>
-                            <input type="number" id="craftStamina" class="highlight-input" value="1000" min="0" step="1">
+                            <input type="number" id="craftStamina" class="highlight-input" value="10000" min="0" step="1">
                         </div>
                         <div style="flex-shrink:0;">
                             <div class="fee-note" style="margin:0 0 4px;">&nbsp;</div>
@@ -1505,7 +1506,7 @@ body {
                         <span class="r-right">单体力净利</span>
                     </div>
                     <div id="craftRankBody">
-                        <div class="rank-row"><span style="grid-column:1/-1;text-align:center;color:var(--text-secondary);padding:16px;">暂无有效数据，请先在「货运道具价格表」填写成品售价</span></div>
+                        <div class="rank-row"><span style="grid-column:1/-1;text-align:center;color:var(--text-secondary);padding:16px;">暂无有效数据，请先在「货运道具价格表」或制作表「售价」列填写成品售价、在采集表填出售价</span></div>
                     </div>
                 </div>
 
@@ -1861,7 +1862,7 @@ body {
                 { id: 'item_13', name: '百炼手镯鉴定书', price: 71344 },
                 { id: 'item_14', name: '百炼手套鉴定书', price: 59886 },
                 { id: 'item_15', name: '百炼腰带鉴定书', price: 76777 },
-                { id: 'item_16', name: '百炼项链鉴定书', price: 0 },
+                { id: 'item_16', name: '百炼项链鉴定书', price: 90000 },
                 { id: 'item_17', name: '百炼鞋子鉴定书', price: 0 },
                 { id: 'item_18', name: '灵纹锥', price: 24200 },
                 { id: 'item_19', name: '神铸符石', price: 74980 },
@@ -3109,12 +3110,39 @@ body {
                     var price = Number(g.price) || 0;
                     var stOnce = Number(g.stamina) || 0;
                     var qtyOnce = Number(g.qty) || 0;
-                    if (stOnce <= 0 || price <= 0 || qtyOnce <= 0) return;
-                    // 单体力净利 = 产出数量 × 单价 × (1 + 双倍概率) ÷ 采集体力
+                    if (stOnce <= 0 || qtyOnce <= 0) return;
                     var chance = (Number(g.chance) || 0) / 100;
-                    var perStamina = qtyOnce * price * (1 + chance) / stOnce;
                     var times = Math.floor(stamina / stOnce);
-                    if (times <= 0) return;
+                    if (times <= 0) {
+                        // 体力不足一次采集：仍列出，标记"体力不足"，沉底显示
+                        rows.push({
+                            type: "采集",
+                            name: matName,
+                            times: 0,
+                            unitCost: 0,
+                            profit: 0,
+                            perStamina: 0,
+                            totalSt: stOnce,
+                            lowStamina: true
+                        });
+                        return;
+                    }
+                    if (price <= 0) {
+                        // 未填出售价：仍列出，标记"未填售价"，沉底显示
+                        rows.push({
+                            type: "采集",
+                            name: matName,
+                            times: times,
+                            unitCost: 0,
+                            profit: 0,
+                            perStamina: 0,
+                            totalSt: stOnce,
+                            missingSale: true
+                        });
+                        return;
+                    }
+                    // 单体力净利 = 产出数量 × 单价 × (1 + 双倍概率) ÷ 采集体力
+                    var perStamina = qtyOnce * price * (1 + chance) / stOnce;
                     var incomeOnce = perStamina * stOnce; // 单次采集收入
                     rows.push({
                         type: "采集",
@@ -3129,17 +3157,43 @@ body {
                 // —— 制造方案（制造成品出售） ——
                 guildItems.forEach(function (it) {
                     var sp = salePriceOf(it); // 售价：默认同步「货运道具价格表」，可手动覆盖
-                    if (sp <= 0) return;
                     var totalSt = totalStaminaOf(it); // 所需体力 = 制造体力本身
                     if (totalSt <= 0) return;
                     var unitCost = costOf(it); // 一次制造的材料成本（采集材料按出售价计入）
                     var expected = expectedOutputOf(it); // 期望产出（含双倍概率）
+                    var times = Math.floor(stamina / totalSt); // 该体力可制造次数
+                    if (times <= 0) {
+                        // 体力不足一次制造：仍列出，标记"体力不足"，沉底显示
+                        rows.push({
+                            type: "制造",
+                            name: it.name,
+                            times: 0,
+                            unitCost: unitCost,
+                            profit: 0,
+                            perStamina: 0,
+                            totalSt: totalSt,
+                            lowStamina: true
+                        });
+                        return;
+                    }
+                    if (sp <= 0) {
+                        // 未填售价：仍列出（利润按"亏掉全部成本"计算），标记"未填售价"，沉底显示
+                        rows.push({
+                            type: "制造",
+                            name: it.name,
+                            times: times,
+                            unitCost: unitCost,
+                            profit: -unitCost * times,
+                            perStamina: -unitCost / totalSt,
+                            totalSt: totalSt,
+                            missingSale: true
+                        });
+                        return;
+                    }
                     // 单次制造收入 = 期望产出 × 售价；单体力净利 = (期望产出×售价 − 成本) ÷ 制造体力
                     var incomeOnce = expected * sp;
                     var profitOnce = incomeOnce - unitCost;
                     var perStamina = profitOnce / totalSt; // 单体力净利润
-                    var times = Math.floor(stamina / totalSt); // 该体力可制造次数
-                    if (times <= 0) return;
                     rows.push({
                         type: "制造",
                         name: it.name,
@@ -3150,7 +3204,13 @@ body {
                         totalSt: totalSt
                     });
                 });
-                rows.sort(function (a, b) { return b.perStamina - a.perStamina; });
+                // 排序：缺售价、体力不足项沉底，其余按单体力利润从高到低
+                rows.sort(function (a, b) {
+                    var pa = a.missingSale || a.lowStamina ? 1 : 0;
+                    var pb = b.missingSale || b.lowStamina ? 1 : 0;
+                    if (pa !== pb) return pa - pb;
+                    return b.perStamina - a.perStamina;
+                });
                 return { rows: rows, stamina: stamina };
             }
             window.calcCraftsman = function () {
@@ -3160,11 +3220,32 @@ body {
                 var bestStats = document.getElementById("craftBestStats");
                 var body = document.getElementById("craftRankBody");
                 var btn = document.getElementById("craftExpandBtn");
-                if (!c.rows.length) {
+                var missingCount = 0, lowCount = 0, validCount = 0;
+                c.rows.forEach(function (r) {
+                    if (r.missingSale) missingCount++;
+                    else if (r.lowStamina) lowCount++;
+                    else validCount++;
+                });
+                var hasValid = validCount > 0;
+                if (!hasValid) {
                     bestBox.style.opacity = "0.55";
                     bestName.textContent = "暂无有效方案";
-                    bestStats.textContent = "请先在「货运道具价格」或在「工匠采集价格」制作表中填成品售价，或在采集表中填出售价后返回本页";
-                    body.innerHTML = "<div class=\"rank-row\"><span style=\"grid-column:1/-1;text-align:center;color:var(--text-secondary);padding:16px;\">暂无有效方案：请在「货运道具价格」或制作表「售价」列填成品售价，或在采集表中填出售价</span></div>";
+                    bestStats.textContent = "可列出的项都不可行：请先补填售价（未填 " + missingCount + " 项），或增大输入体力（体力不足 " + lowCount + " 项）后重新计算";
+                    body.innerHTML = "<div class=\"rank-row\"><span style=\"grid-column:1/-1;text-align:center;color:var(--text-secondary);padding:16px;\">⚠️ 以下项已全部列出：带「未填售价」请去补填；带「体力不足」请增大上方输入体力</span></div>" +
+                        c.rows.slice(0, 8).map(function (r, i) {
+                            var tag = r.type === "采集"
+                                ? "<span class=\"tag tag-blue\">采集</span>"
+                                : "<span class=\"tag tag-gold\">制造</span>";
+                            var tip = r.missingSale ? "⚠️ 未填售价" : "💤 体力不足";
+                            return "<div class=\"rank-row\">" +
+                                "<span class=\"r-num\">" + (i + 1) + "</span>" +
+                                "<span class=\"r-name\">" + esc(r.name) + " " + tag + "</span>" +
+                                "<span class=\"r-right hide-m\">" + (r.type === "采集" ? "无成本" : fmt(r.unitCost)) + "</span>" +
+                                "<span class=\"r-right hide-m\">" + (r.lowStamina ? "需" + fmt(r.totalSt) + "体力" : fmt(r.times) + " 次") + "</span>" +
+                                "<span class=\"r-right\">" + tip + "</span>" +
+                                "<span class=\"r-right\">—</span>" +
+                            "</div>";
+                        }).join("");
                     return;
                 }
                 bestBox.style.opacity = "1";
@@ -3177,13 +3258,22 @@ body {
                     var tag = r.type === "采集"
                         ? "<span class=\"tag tag-blue\">采集</span>"
                         : "<span class=\"tag tag-gold\">制造</span>";
+                    var tipHtml = r.missingSale
+                        ? "<span class=\"tag tag-warn\" style=\"background:#fff3cd;color:#b58a00;border:1px solid #f0d77a;\">⚠️ 未填售价</span>"
+                        : (r.lowStamina
+                            ? "<span class=\"tag tag-warn\" style=\"background:#e8f4fd;color:#2a6f97;border:1px solid #bcd9ef;\">💤 体力不足</span>"
+                            : "");
+                    var timesHtml = r.lowStamina ? "需" + fmt(r.totalSt) + "体力" : fmt(r.times) + " 次";
+                    var profitHtml = r.missingSale
+                        ? (r.type === "采集" ? "未填价" : "亏" + fmt(-r.profit))
+                        : (r.lowStamina ? "—" : ((r.profit >= 0 ? "+" : "") + fmt(r.profit)));
                     return "<div class=\"rank-row" + (i === 0 ? " best" : "") + "\">" +
                         "<span class=\"r-num\">" + (i + 1) + "</span>" +
-                        "<span class=\"r-name\">" + (i === 0 ? "<span class=\"star\">★</span>" : "") + esc(r.name) + " " + tag + "</span>" +
+                        "<span class=\"r-name\">" + (i === 0 ? "<span class=\"star\">★</span>" : "") + esc(r.name) + " " + tag + " " + tipHtml + "</span>" +
                         "<span class=\"r-right hide-m\">" + (r.type === "采集" ? "无成本" : fmt(r.unitCost)) + "</span>" +
-                        "<span class=\"r-right hide-m\">" + fmt(r.times) + " 次</span>" +
-                        "<span class=\"r-right " + (r.profit >= 0 ? "profit-positive" : "profit-negative") + "\">" + (r.profit >= 0 ? "+" : "") + fmt(r.profit) + "</span>" +
-                        "<span class=\"r-right\">" + fmt2(r.perStamina) + "</span>" +
+                        "<span class=\"r-right hide-m\">" + timesHtml + "</span>" +
+                        "<span class=\"r-right " + (r.missingSale || r.lowStamina ? "" : (r.profit >= 0 ? "profit-positive" : "profit-negative")) + "\">" + profitHtml + "</span>" +
+                        "<span class=\"r-right\">" + (r.missingSale || r.lowStamina ? "—" : fmt2(r.perStamina)) + "</span>" +
                     "</div>";
                 }).join("");
             };
