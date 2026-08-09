@@ -1564,7 +1564,8 @@ body {
                 </div>
 
                 <div class="section-note">
-                    📌 <b>合成配方表：</b>填写各成品所需材料与数量。成品的<b>售价自动同步「货运道具价格表」</b>，
+                    📌 <b>合成配方表：</b>填写各成品所需材料与数量。成品的<b>售价与「货运道具价格表」双向联动</b>：
+                    在售价列修改会直接写回货运道具价格表并上传云端共享，货运表改价也会同步刷新本表；
                     材料为<b>固定价格</b>的（如绸布、麻布等）只读引用下方数据库，其余材料单价可在此手动维护。
                 </div>
 
@@ -1583,7 +1584,7 @@ body {
                                 <th style="width:155px;">材料①(名×数@价)</th>
                                 <th style="width:155px;">材料②(可空)</th>
                                 <th style="width:155px;">材料③(可空)</th>
-                                <th style="width:70px;">售价</th>
+                                <th style="width:76px;" title="默认同步货运道具价格表，可手动修改">售价</th>
                                 <th style="width:76px;text-align:right;">成本</th>
                             </tr>
                         </thead>
@@ -1642,7 +1643,7 @@ body {
                     <div class="formula-box">
                         <b>公式说明</b><br>
                         • 材料成本（单件）= (材料①数量×单价 + 材料②数量×单价 + 材料③数量×单价) ÷ 产出数量<br>
-                        • 成品售价自动同步「货运道具价格表」，成交后扣除 5% 手续费（实际到手 95%）<br>
+                        • 成品售价与「货运道具价格表」双向联动（此处修改会写回货运表并云端共享）；成交后扣除 5% 手续费（实际到手 95%）<br>
                         • 采集「出售价」由高级会员上传至云端共享，全员每 30 秒自动拉取最新价格<br>
                         • 双倍概率仅保存在本机，刷新页面后恢复默认值
                     </div>
@@ -2517,6 +2518,25 @@ body {
             window.parseAndFillOCR = parseAndFillOCR;
             window.renderFullPriceTableDOM = renderFullPriceTableDOM;
             window.getItemPrice = getItemPrice;
+            // —— 工匠表改售价时反向写回货运道具价格表（双向联动） ——
+            window.__setFreightPrice = function (name, price) {
+                const it = items.find(i => i.name === name);
+                if (!it) return false;
+                const v = Math.max(0, Math.floor(Number(price) || 0));
+                const changed = Number(it.price) !== v;
+                it.price = v;
+                if (changed) {
+                    // 同步货运表所有同款输入框（不重绘，避免焦点丢失）
+                    document.querySelectorAll(`input[data-item-id="${it.id}"][data-field="price"]`).forEach(inp => { inp.value = v; });
+                    updateSelectOptionsText();
+                    orders.forEach(o => updateSingleOrderDisplay(o.id));
+                    updateResults();
+                    // 联动工匠表售价列与工匠计算，并记录待同步（云端共享）
+                    if (window.refreshGuildSales) window.refreshGuildSales();
+                    if (window.__registerPendingFreight) window.__registerPendingFreight(it.name, v);
+                }
+                return true;
+            };
             // —— 云端同步钩子（供会员系统脚本调用） ——
             window.__applyCloudFreight = function (name, price) {
                 const it = items.find(i => i.name === name);
@@ -2746,6 +2766,7 @@ body {
                 "黄龙玉": { stamina: 30, qty: 1, chance: 20, price: 107 },
                 "银矿石": { stamina: 80, qty: 1, chance: 20, price: 294 },
                 "红水晶": { stamina: 200, qty: 1, chance: 20, price: 530 },
+                "红纹石": { stamina: 120, qty: 1, chance: 0, price: 710 },
                 "赤玉": { stamina: 200, qty: 1, chance: 20, price: 665 },
                 "金矿石": { stamina: 90, qty: 1, chance: 20, price: 304 },
                 "寒铁矿石": { stamina: 100, qty: 1, chance: 14, price: 419 },
@@ -2811,6 +2832,10 @@ body {
                 if (window.getItemPrice) p = window.getItemPrice(it.name);
                 return p || 0;
             }
+            // 成品售价：与「货运道具价格表」双向联动（货运表为唯一数据源，此处编辑会写回货运表）
+            function salePriceOf(it) {
+                return syncedSalePrice(it);
+            }
             // 材料单价只读/可编辑：采集材料(0)与固定材料(数据库价)只读
             function renderMatCell(idx, mat, prefix) {
                 if (!mat) return "<td><span class=\"g-name\" style=\"color:var(--text-secondary);\">—</span></td>";
@@ -2850,7 +2875,9 @@ body {
                         renderMatCell(i, it.mat1, "m1") +
                         renderMatCell(i, it.mat2, "m2") +
                         renderMatCell(i, it.mat3, "m3") +
-                        "<td class=\"sale-cell\" data-idx=\"" + i + "\" style=\"text-align:right;color:var(--primary-dark);font-weight:600;\">" + fmt(syncedSalePrice(it)) + "</td>" +
+                        "<td class=\"sale-cell\" data-idx=\"" + i + "\" style=\"text-align:right;\">" +
+                            "<input class=\"sale-input\" data-idx=\"" + i + "\" data-f=\"sale\" type=\"number\" min=\"0\" step=\"1\" value=\"" + (salePriceOf(it) || 0) + "\" title=\"成品售价：与「货运道具价格表」双向联动，此处修改会写回货运表并上传云端共享；清空或填 0 不写回\" style=\"width:100%;text-align:right;color:var(--primary-dark);font-weight:600;\">" +
+                        "</td>" +
                         "<td class=\"cost-cell\" data-cost=\"" + i + "\">" + fmt(costOf(it)) + "</td>";
                     body.appendChild(tr);
                 });
@@ -2866,7 +2893,8 @@ body {
                 var saleEls = document.querySelectorAll(".sale-cell[data-idx]");
                 for (var j = 0; j < saleEls.length; j++) {
                     var git = guildItems[Number(saleEls[j].getAttribute("data-idx"))];
-                    saleEls[j].textContent = fmt(git ? syncedSalePrice(git) : 0);
+                    var si = saleEls[j].querySelector(".sale-input");
+                    if (si && si !== document.activeElement) si.value = git ? (salePriceOf(git) || 0) : 0;
                 }
             }
 
@@ -2903,6 +2931,21 @@ body {
                         break;
                     }
                     case "chance": lab = "双倍概率"; oldV = it.chance; newV = Math.min(100, Math.max(0, Number(inp.value) || 0)); it.chance = newV; changed = (oldV !== newV); break;
+                    case "sale": {
+                        lab = "成品售价";
+                        var curSale = salePriceOf(it);
+                        oldV = curSale;
+                        newV = Math.max(0, Number(inp.value) || 0);
+                        delete it.sale; // 售价以货运道具价格表为唯一数据源
+                        if (newV > 0 && window.__setFreightPrice) {
+                            window.__setFreightPrice(it.name, newV); // 反向写回货运表 + 注册待同步
+                            changed = (oldV !== newV);
+                        } else {
+                            inp.value = curSale; // 清空或填 0 不写回，恢复显示货运表价格
+                            changed = false;
+                        }
+                        break;
+                    }
                 }
                 if (changed && lab) logChange(lab, it.name, oldV, newV);
                 persistGuild();
@@ -3004,7 +3047,7 @@ body {
             window.__zeroGather = function () {
                 Object.keys(gatherInfo).forEach(function (n) { gatherInfo[n].price = 0; gatherInfo[n].chance = 0; });
                 Object.keys(fixedMats).forEach(function (n) { fixedMats[n] = 0; });
-                guildItems.forEach(function (g) { g.chance = 0; });
+                guildItems.forEach(function (g) { g.chance = 0; delete g.sale; });
                 saveGather();
                 saveFixedMats();
                 renderGatherTable();
@@ -3019,6 +3062,7 @@ body {
                 saveGather();
                 saveFixedMats();
                 applyDefaultChances();
+                guildItems.forEach(function (g) { delete g.sale; });
                 renderGatherTable();
                 renderGuildTable();
                 renderFixedMatTable();
@@ -3056,7 +3100,7 @@ body {
                 });
                 // —— 制造方案（制造成品出售） ——
                 guildItems.forEach(function (it) {
-                    var sp = syncedSalePrice(it); // 售价与「货运道具价格表」同步
+                    var sp = salePriceOf(it); // 售价：默认同步「货运道具价格表」，可手动覆盖
                     if (sp <= 0) return;
                     var totalSt = totalStaminaOf(it); // 所需体力 = 制造体力本身
                     if (totalSt <= 0) return;
@@ -3091,8 +3135,8 @@ body {
                 if (!c.rows.length) {
                     bestBox.style.opacity = "0.55";
                     bestName.textContent = "暂无有效方案";
-                    bestStats.textContent = "请先在「货运道具价格」填成品售价，或在「工匠采集价格」填采集出售价后返回本页";
-                    body.innerHTML = "<div class=\"rank-row\"><span style=\"grid-column:1/-1;text-align:center;color:var(--text-secondary);padding:16px;\">暂无有效方案：请在「货运道具价格」填成品售价，或「工匠采集价格」的采集表中填出售价</span></div>";
+                    bestStats.textContent = "请先在「货运道具价格」或在「工匠采集价格」制作表中填成品售价，或在采集表中填出售价后返回本页";
+                    body.innerHTML = "<div class=\"rank-row\"><span style=\"grid-column:1/-1;text-align:center;color:var(--text-secondary);padding:16px;\">暂无有效方案：请在「货运道具价格」或制作表「售价」列填成品售价，或在采集表中填出售价</span></div>";
                     return;
                 }
                 bestBox.style.opacity = "1";
