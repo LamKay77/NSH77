@@ -1566,7 +1566,8 @@ body {
                 <div class="section-note">
                     📌 <b>合成配方表：</b>填写各成品所需材料与数量。成品的<b>售价与「货运道具价格表」双向联动</b>：
                     在售价列修改会直接写回货运道具价格表并上传云端共享，货运表改价也会同步刷新本表；
-                    材料为<b>固定价格</b>的（如绸布、麻布等）只读引用下方数据库，其余材料单价可在此手动维护。
+                    <b>采集材料</b>（绿色）价格可直接修改，并<b>自动写回下方材料采集表</b>保持关联、参与云端共享；
+                    <b>固定材料</b>（如绸布、麻布等，金色）只读引用下方数据库。
                 </div>
 
                 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
@@ -1644,6 +1645,7 @@ body {
                         <b>公式说明</b><br>
                         • 材料成本（单件）= (材料①数量×单价 + 材料②数量×单价 + 材料③数量×单价) ÷ 产出数量<br>
                         • 成品售价与「货运道具价格表」双向联动（此处修改会写回货运表并云端共享）；成交后扣除 5% 手续费（实际到手 95%）<br>
+                        • 采集材料价格在制作表中可直接修改，自动写回采集表并参与云端共享（与采集表保持关联）<br>
                         • 采集「出售价」由高级会员上传至云端共享，全员每 30 秒自动拉取最新价格<br>
                         • 双倍概率仅保存在本机，刷新页面后恢复默认值
                     </div>
@@ -2843,15 +2845,15 @@ body {
                 var isFixed = !isGather && mat.name && fixedMats[mat.name] !== undefined;
                 var priceInput;
                 if (isGather) {
-                    // 采集材料：单价显示采集表「出售价」（同步，只读）；制造时按此价计入成本
+                    // 采集材料：价格可修改，写回采集表（保持关联）并上传云端；制造时按此价计入成本
                     var gPrice = Number(gatherInfo[mat.name].price) || 0;
-                    priceInput = "<input class=\"g-price\" value=\"" + gPrice + "\" readonly title=\"采集材料：价值来自下方采集表出售价\" style=\"background:var(--success-bg);color:var(--primary-dark);\">";
+                    priceInput = "<input class=\"g-price\" type=\"number\" min=\"0\" step=\"1\" data-idx=\"" + idx + "\" data-f=\"gp\" data-gather-p=\"" + esc(mat.name) + "\" value=\"" + gPrice + "\" title=\"采集材料：价格可修改，自动写回下方采集表并上传云端共享\" style=\"background:var(--success-bg);color:var(--primary-dark);width:100%;\">";
                 } else if (isFixed) {
                     priceInput = "<input class=\"g-price\" value=\"" + fixedMats[mat.name] + "\" readonly title=\"固定材料价格\" style=\"background:var(--gold-bg);color:var(--primary-dark);\">";
                 } else {
                     priceInput = "<input class=\"g-price\" value=\"" + (Number(mat.price) || 0) + "\" readonly title=\"配方固定材料单价\">";
                 }
-                // 配方固定：材料名、数量、单价全部只读
+                // 材料名、数量只读；采集材料价格可编辑，固定材料价格只读
                 return "<td><div class=\"guild-mat\">" +
                     "<input class=\"g-name\" value=\"" + esc(mat.name) + "\" readonly title=\"配方固定材料名\"><span class=\"g-x\">×</span>" +
                     "<input class=\"g-num\" value=\"" + (Number(mat.qty) || 0) + "\" readonly title=\"配方固定数量\" style=\"text-align:center;\"><span class=\"g-x\">@</span>" +
@@ -2897,6 +2899,16 @@ body {
                     if (si && si !== document.activeElement) si.value = git ? (salePriceOf(git) || 0) : 0;
                 }
             }
+            // 采集材料价格修改后：同步下方采集表与本表中所有引用该材料的价格显示（保持关联，不重绘避免丢焦点）
+            function syncGatherPriceInputs(name, v) {
+                var gBody = document.getElementById("gatherBody");
+                if (gBody) gBody.querySelectorAll("input[data-mat][data-f=\"price\"]").forEach(function (gInp) {
+                    if (gInp.getAttribute("data-mat") === name) gInp.value = v;
+                });
+                document.querySelectorAll("#guildTableBody input[data-gather-p]").forEach(function (gInp) {
+                    if (gInp.getAttribute("data-gather-p") === name && gInp !== document.activeElement) gInp.value = v;
+                });
+            }
 
             document.getElementById("guildTableBody").addEventListener("input", function (e) {
                 var inp = e.target;
@@ -2931,6 +2943,22 @@ body {
                         break;
                     }
                     case "chance": lab = "双倍概率"; oldV = it.chance; newV = Math.min(100, Math.max(0, Number(inp.value) || 0)); it.chance = newV; changed = (oldV !== newV); break;
+                    case "gp": {
+                        // 采集材料价格：写回采集表（保持关联）+ 注册云端待同步
+                        var gName = inp.getAttribute("data-gather-p");
+                        if (!gName || gatherInfo[gName] === undefined) break;
+                        lab = "采集材料价格";
+                        oldV = Number(gatherInfo[gName].price) || 0;
+                        newV = Math.max(0, Number(inp.value) || 0);
+                        if (oldV !== newV) {
+                            gatherInfo[gName].price = newV;
+                            saveGather();
+                            if (window.__registerPendingGather) window.__registerPendingGather(gName, newV);
+                            syncGatherPriceInputs(gName, newV);
+                            changed = true;
+                        }
+                        break;
+                    }
                     case "sale": {
                         lab = "成品售价";
                         var curSale = salePriceOf(it);
