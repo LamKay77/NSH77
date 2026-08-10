@@ -4247,16 +4247,37 @@ body {
             }
         });
 
+        function seekUI(t) {
+            curEl.textContent = fmt(t);
+            const pct = audio.duration ? (t / audio.duration * 100) : 0;
+            seek.style.setProperty('--p', pct + '%');
+        }
         seek.addEventListener('input', function () {
             seeking = true;
-            curEl.textContent = fmt(+seek.value);
-            const pct = audio.duration ? (+seek.value / audio.duration * 100) : 0;
-            seek.style.setProperty('--p', pct + '%');
+            seekUI(+seek.value);
         });
-        seek.addEventListener('change', function () {
-            audio.currentTime = +seek.value;
-            seeking = false;
-        });
+        function commitSeek() {
+            const dur = audio.duration || 0;
+            let t = +seek.value;
+            if (!isFinite(t) || !dur) return;
+            if (t < 0) t = 0;
+            if (t > dur) t = dur;
+            seeking = true;
+            try {
+                // fastSeek 对流媒体更友好；不支持则回退到 currentTime
+                if (typeof audio.fastSeek === 'function') audio.fastSeek(t);
+                else audio.currentTime = t;
+            } catch (e) {
+                console.warn('[player] seek failed:', e);
+            }
+        }
+        seek.addEventListener('change', commitSeek);
+        // 某些浏览器/云端环境下 change 不可靠，用 click/touchend 兜底
+        seek.addEventListener('click', commitSeek);
+        seek.addEventListener('touchend', commitSeek, { passive: true });
+        // 真正 seek 完成后再解除标志，避免 timeupdate 把进度条拉回旧位置
+        audio.addEventListener('seeked', function () { seeking = false; });
+        audio.addEventListener('error', function () { seeking = false; });
 
         playBtn.addEventListener('click', function () {
             if (audio.paused) audio.play(); else audio.pause();
