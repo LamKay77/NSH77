@@ -4214,6 +4214,39 @@ body {
             durEl.textContent = fmt(audio.duration);
             seek.max = audio.duration || 100;
         });
+
+        // ---- Blob 源兜底：云端静态托管常不支持 HTTP Range，导致点击进度条从头播放 ----
+        // 用 fetch 拉取整首歌为 Blob，交给 <audio> 本地播放，seek 完全在内存进行，不依赖服务器 Range。
+        (function setupBlobSource() {
+            const originalSrc = audio.getAttribute('src');
+            if (!originalSrc) return;
+            let swapped = false;
+            function toBlob() {
+                if (swapped) return;
+                fetch(originalSrc)
+                    .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.blob(); })
+                    .then(function (blob) {
+                        swapped = true;
+                        const mp3 = (blob.type && blob.type.indexOf('audio') >= 0)
+                            ? blob : new Blob([blob], { type: 'audio/mpeg' });
+                        const wasPlaying = !audio.paused;
+                        const pos = audio.currentTime || 0;
+                        audio.src = URL.createObjectURL(mp3);
+                        audio.load();
+                        const restore = function () {
+                            try { if (pos > 0.5) audio.currentTime = pos; } catch (e) {}
+                            audio.removeEventListener('loadedmetadata', restore);
+                        };
+                        audio.addEventListener('loadedmetadata', restore);
+                        if (wasPlaying) audio.play().catch(function () {});
+                    })
+                    .catch(function (err) {
+                        console.warn('[player] Blob 源降级失败，使用原生 src：', err);
+                    });
+            }
+            if (audio.readyState >= 1) toBlob();
+            else audio.addEventListener('loadedmetadata', toBlob, { once: true });
+        })();
         audio.addEventListener('play', function () {
             dock.classList.add('playing');
             playBtn.classList.add('is-playing');
@@ -4256,13 +4289,17 @@ body {
             seeking = true;
             seekUI(+seek.value);
         });
-        function commitSeek() {
+        // 设定到指定秒数（t 缺省则取进度条当前值）
+        function commitSeek(t) {
             const dur = audio.duration || 0;
-            let t = +seek.value;
+            if (t == null) t = +seek.value;
+            t = +t;
             if (!isFinite(t) || !dur) return;
             if (t < 0) t = 0;
             if (t > dur) t = dur;
+            seek.value = t;
             seeking = true;
+            seekUI(t);
             try {
                 // fastSeek 对流媒体更友好；不支持则回退到 currentTime
                 if (typeof audio.fastSeek === 'function') audio.fastSeek(t);
@@ -4271,10 +4308,21 @@ body {
                 console.warn('[player] seek failed:', e);
             }
         }
-        seek.addEventListener('change', commitSeek);
-        // 某些浏览器/云端环境下 change 不可靠，用 click/touchend 兜底
-        seek.addEventListener('click', commitSeek);
-        seek.addEventListener('touchend', commitSeek, { passive: true });
+        // 按指针坐标计算目标时间，避免读取 seek.value 的时序问题（某些浏览器点按会先触发 click 而值未更新）
+        function seekFromPointer(e) {
+            const rect = seek.getBoundingClientRect();
+            if (!rect.width) return;
+            const clientX = (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX;
+            let ratio = (clientX - rect.left) / rect.width;
+            ratio = Math.max(0, Math.min(1, ratio));
+            const dur = audio.duration || 0;
+            if (!dur) return;
+            commitSeek(ratio * dur);
+        }
+        seek.addEventListener('change', function () { commitSeek(); });
+        // 某些浏览器/云端环境下 change 不可靠，用 click/touchend 兜底（按坐标计算）
+        seek.addEventListener('click', seekFromPointer);
+        seek.addEventListener('touchend', seekFromPointer, { passive: true });
         // 真正 seek 完成后再解除标志，避免 timeupdate 把进度条拉回旧位置
         audio.addEventListener('seeked', function () { seeking = false; });
         audio.addEventListener('error', function () { seeking = false; });
