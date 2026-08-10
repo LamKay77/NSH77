@@ -1415,7 +1415,7 @@ body {
             <!-- 价格模式开关 -->
             <div class="mode-switch-bar">
                 <span class="ms-label">🗒️ 空白</span>
-                <label class="switch" title="空白模式：所有价格为0，手动填写">
+                <label class="switch" title="空白模式：采集/货运价格为0手动填写，固定材料价格保留默认数据">
                     <input type="checkbox" id="modeToggle" onchange="NSH.toggleMode()">
                     <span class="slider"></span>
                 </label>
@@ -1779,6 +1779,7 @@ body {
                     <div class="formula-box" style="background:var(--gold-bg);border-color:var(--gold-border);">
                         <b>🔒 固定材料价格（数据库）</b><br>
                         以下材料为固定收购价，自动同步到上方制作表；修改后保存到本地数据库（localStorage）。
+                        空白模式下也<b>保留默认数据</b>（固定收购价不归零）。
                         <div style="margin-top:8px;overflow-x:auto;">
                             <table class="guild-table">
                                 <thead>
@@ -1925,6 +1926,7 @@ body {
                         <li>提示「普通会员无法同步」？累计签到 7 天，或联系管理员升级。</li>
                         <li>同步后部分价格没变化？云端有更新版本时系统自动采用最新值，属正常机制。</li>
                         <li>双倍概率刷新后恢复默认？双倍概率仅保存在本机，不参与云端同步。</li>
+                        <li>空白模式下固定材料价格会归零吗？不会。空白模式仅清零采集/货运价格与双倍概率，<b>固定材料保留默认收购价</b>（绸布、麻布、宝石等）。</li>
                     </ul>
                 </div>
             </div>
@@ -2001,7 +2003,7 @@ body {
                     <span class="mode-emoji">🗒️</span>
                     <span>
                         <span class="mode-title">空白模式</span>
-                        <span class="mode-desc">所有价格均未填写，由你手动输入</span>
+                        <span class="mode-desc">采集/货运价格由你手动输入，固定材料价格保留默认数据</span>
                     </span>
                 </button>
                 <button type="button" class="mode-option" onclick="NSH.chooseMode('cloud')">
@@ -3248,8 +3250,9 @@ body {
                 return true;
             };
             window.__zeroGather = function () {
+                // 空白模式：采集/货运价格与双倍爆率归零；固定材料为游戏固定收购价，保留默认数据
                 Object.keys(gatherInfo).forEach(function (n) { gatherInfo[n].price = 0; gatherInfo[n].chance = 0; });
-                Object.keys(fixedMats).forEach(function (n) { fixedMats[n] = 0; });
+                fixedMats = Object.assign({}, DEFAULT_FIXED_MATS);
                 guildItems.forEach(function (g) { g.chance = 0; delete g.sale; });
                 saveGather();
                 saveFixedMats();
@@ -3617,7 +3620,7 @@ body {
                 var hint = document.getElementById("syncHint");
                 if (hint) {
                     if (getMode() === "blank") {
-                        hint.innerHTML = "🗒️ 空白模式：所有价格与双倍爆率均为 0，可手动填写或导入存档";
+                        hint.innerHTML = "🗒️ 空白模式：采集/货运价格与双倍爆率均为 0，可手动填写或导入存档；固定材料价格保留默认数据";
                     } else if (n > 0) {
                         hint.innerHTML = "⚠️ 有 <b>" + n + "</b> 项本地价格修改尚未同步（仅高级会员可上传共享）";
                     } else {
@@ -3918,13 +3921,13 @@ body {
             }
             function applyMode(mode) {
                 if (mode === "blank") {
-                    // 空白模式：所有价格归零、双倍爆率归零，不拉取云端
+                    // 空白模式：采集/货运价格归零、双倍爆率归零，不拉取云端；固定材料保留默认数据
                     stopPolling();
                     if (window.__clearPendingGather) window.__clearPendingGather();
                     if (window.__zeroFreight) window.__zeroFreight();
                     if (window.__zeroGather) window.__zeroGather();
                     var h = document.getElementById("syncHint");
-                    if (h) h.innerHTML = "🗒️ 空白模式：所有价格与双倍爆率均为 0，可手动填写或导入存档";
+                    if (h) h.innerHTML = "🗒️ 空白模式：采集/货运价格与双倍爆率均为 0，可手动填写或导入存档；固定材料价格保留默认数据";
                 } else {
                     // 云端价格模式：恢复默认价后拉取云端最新价
                     if (window.__clearPendingGather) window.__clearPendingGather();
