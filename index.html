@@ -960,6 +960,10 @@
   --radius: 18px;
   --radius-lg: 26px;
   --font-display: "Noto Serif SC", "Ma Shan Zheng", serif;
+  --auc-win: #4f9d97;
+  --auc-other: #5b9bd5;
+  --auc-grab: #d9a06a;
+  --auc-mid: #e0a93c;
 }
 
 body {
@@ -1371,6 +1375,73 @@ body {
   .md-controls{ padding:0; flex:0 0 auto; gap:0; }
   .md-btn{ width:40px; height:40px; }
   .md-btn.play{ width:48px; height:48px; }
+}
+
+/* ===================== 拍卖计算器（auc- 前缀，浅色主题） ===================== */
+.auc-panel{
+  background: var(--soft-blue);
+  border: 1px solid var(--blue-border);
+  border-radius: var(--radius-sm);
+  padding: 16px 18px;
+  margin-bottom: 16px;
+}
+.auc-panel-title{ font-size: 0.95rem; font-weight: 700; color: var(--text); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.auc-tag2{ font-size: 0.72rem; color: var(--text-secondary); font-weight: 400; }
+.auc-grid{ display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
+.auc-grid label{ font-size: 0.76rem; margin-bottom: 4px; }
+.auc-cards{ display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+.auc-card{
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 15px 16px 14px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.auc-card .auc-tag{
+  position: absolute; top: 0; left: 0;
+  font-size: 0.7rem; padding: 3px 10px; border-bottom-right-radius: 8px; font-weight: 600; color: #fff;
+}
+.auc-card.theory .auc-tag{ background: var(--auc-other); }
+.auc-card.reason .auc-tag{ background: var(--auc-mid); }
+.auc-card.limit .auc-tag{ background: var(--auc-grab); }
+.auc-card h3{ font-size: 0.82rem; margin: 18px 0 2px; color: var(--text); font-weight: 600; }
+.auc-card .auc-formula{ font-size: 0.68rem; color: var(--text-secondary); margin-bottom: 8px; font-family: Consolas, Menlo, monospace; word-break: break-all; }
+.auc-bid{ font-size: 1.55rem; font-weight: 700; margin: 4px 0 10px; color: var(--text); }
+.auc-row{ display: flex; justify-content: space-between; gap: 10px; font-size: 0.8rem; padding: 5px 0; border-bottom: 1px dashed var(--border-light); }
+.auc-row:last-child{ border-bottom: none; }
+.auc-row .auc-v{ font-variant-numeric: tabular-nums; font-weight: 600; }
+.auc-c-win{ color: var(--auc-win); }
+.auc-c-other{ color: var(--auc-other); }
+.auc-c-grab{ color: var(--auc-grab); }
+.auc-reco{ padding: 12px 14px; border-radius: 10px; font-size: 0.8rem; line-height: 1.6; }
+.auc-reco.danger{ background: var(--danger-bg); border: 1px solid rgba(217,139,122,.45); color: #a05444; }
+.auc-reco.safe{ background: var(--success-bg); border: 1px solid rgba(79,157,151,.4); color: #2e6d68; }
+.auc-reco.mid{ background: #fdf6e3; border: 1px solid rgba(223,161,63,.45); color: #8a6a1f; }
+.auc-reco.high{ background: #fdf3e7; border: 1px solid rgba(217,160,106,.45); color: #96612c; }
+.auc-reco.loss{ background: var(--danger-bg); border: 1px solid rgba(217,139,122,.6); color: #a05444; font-weight: 600; }
+.auc-reco b{ color: inherit; }
+.auc-table-wrap{ overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.auc-table-wrap table{ width: 100%; border-collapse: collapse; font-size: 0.78rem; min-width: 560px; }
+.auc-table-wrap th, .auc-table-wrap td{ padding: 9px 8px; text-align: right; border-bottom: 1px solid var(--border-light); font-variant-numeric: tabular-nums; }
+.auc-table-wrap th:first-child, .auc-table-wrap td:first-child{ text-align: left; }
+.auc-table-wrap th{ color: var(--text-secondary); font-weight: 600; background: var(--soft-blue); }
+.auc-hl-bid, .auc-hl-val{ color: var(--auc-win); font-weight: 600; }
+.auc-legend{ display: flex; gap: 16px; font-size: 0.74rem; margin-top: 8px; color: var(--text-secondary); flex-wrap: wrap; }
+.auc-legend span{ display: inline-flex; align-items: center; gap: 6px; }
+.auc-dot{ width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.auc-note{ font-size: 0.78rem; color: var(--text-secondary); line-height: 1.8; }
+.auc-note b{ color: var(--text); }
+.auc-note code{ background: var(--soft-blue); padding: 1px 6px; border-radius: 4px; color: var(--primary-dark); font-size: 0.74rem; }
+.auc-sim-flex{ display: grid; grid-template-columns: 1fr 1.35fr; gap: 18px; align-items: start; }
+.auc-sim-flex svg{ width: 100%; height: auto; display: block; }
+#aucChart svg{ width: 100%; height: auto; display: block; }
+@media (max-width: 760px){
+  .auc-sim-flex{ grid-template-columns: 1fr; }
+  .auc-panel{ padding: 14px 12px; }
+  .auc-bid{ font-size: 1.3rem; }
+  .auc-cards{ grid-template-columns: 1fr; }
 }
 
 </style>
@@ -1834,49 +1905,129 @@ body {
             <div class="card card--coral">
                 <div class="card-header">
                     <span class="badge badge-module2">🎯</span>
-                    <h2>拍卖计算器</h2>
-                    <span class="hint">防止被卡 &amp; 收益核算</span>
+                    <h2>竞拍收益率计算器</h2>
+                    <span class="hint">Boss 掉落竞价拍卖 · 收益核算</span>
                 </div>
 
-                <div class="highlight-box">
-                    <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;">
-                        <div style="flex:1;min-width:150px;">
-                            <label style="color:var(--primary-dark);font-weight:500;">💰 输入聚珍行价格</label>
-                            <input type="number" id="auctionStart" class="highlight-input" value="100000" min="0" step="1000">
+                <!-- 参数设置 -->
+                <div class="auc-panel">
+                    <div class="auc-panel-title">⚙️ 参数设置</div>
+                    <div class="auc-grid">
+                        <div>
+                            <label>交易行交易价 M（装备卖出价，未扣费）</label>
+                            <input id="aucM" type="number" value="10000" min="1" step="100">
                         </div>
-                        <div style="flex-shrink:0;">
-                            <div class="ocr-radio-group" style="margin:0;">
-                                <label class="ocr-radio-label"><input type="radio" name="auctionMode" value="six" checked onchange="calcAuction()"> 6人拍卖</label>
-                                <label class="ocr-radio-label"><input type="radio" name="auctionMode" value="twelve" onchange="calcAuction()"> 12人拍卖</label>
+                        <div>
+                            <label>竞拍人数 N</label>
+                            <select id="aucN">
+                                <option value="6">6 人</option>
+                                <option value="12">12 人</option>
+                                <option value="90">90 人</option>
+                                <option value="100">100 人</option>
+                                <option value="custom">自定义…</option>
+                            </select>
+                        </div>
+                        <div id="aucNcustomWrap" style="display:none">
+                            <label>自定义人数（≥3）</label>
+                            <input id="aucNcustom" type="number" value="20" min="3" step="1">
+                        </div>
+                        <div>
+                            <label>收益率口径</label>
+                            <select id="aucBasis">
+                                <option value="value">按物品价值 M（价值捕获率，推荐）</option>
+                                <option value="bid">按出价 B（资金收益率）</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>合理价格点口径</label>
+                            <select id="aucMode">
+                                <option value="fixed">固定溢价 δ（收益 = 其他玩家 + δ）</option>
+                                <option value="multi">倍数 α（收益 = 其他玩家 × α）</option>
+                            </select>
+                        </div>
+                        <div id="aucDeltaWrap">
+                            <label>固定溢价 δ（当前口径下的百分点）</label>
+                            <input id="aucDelta" type="number" value="5" min="0" max="9.9" step="0.5">
+                        </div>
+                        <div id="aucAlphaWrap" style="display:none">
+                            <label>倍数 α（须 &lt; 1 + 0.1/其他玩家收益率）</label>
+                            <input id="aucAlpha" type="number" value="1.25" min="1" step="0.05">
+                        </div>
+                    </div>
+                    <div class="auc-reco auc-reco-danger" id="aucWarn" style="display:none;margin-top:14px;"></div>
+                </div>
+
+                <!-- 三个关键价格点 -->
+                <div class="auc-panel">
+                    <div class="auc-panel-title">🎯 三个关键价格点 <span class="auc-tag2" id="aucBasisTag"></span></div>
+                    <div class="auc-cards" id="aucCards"></div>
+                </div>
+
+                <!-- 出价模拟 -->
+                <div class="auc-panel">
+                    <div class="auc-panel-title">🔬 出价模拟（不同出价下的收益率）</div>
+                    <div class="auc-sim-flex">
+                        <div>
+                            <label>当前出价 B（拖动或输入）</label>
+                            <input id="aucB" type="range" style="width:100%;margin:6px 0 14px;accent-color:var(--auc-win);">
+                            <input id="aucBnum" type="number" min="0" step="50">
+                            <div class="auc-reco" id="aucReco" style="margin-top:14px;"></div>
+                        </div>
+                        <div>
+                            <div class="auc-table-wrap">
+                                <table id="aucSimTable">
+                                    <thead><tr><th>角色</th><th>净收益</th><th>收益率<span class="auc-hl-bid">按出价B</span></th><th>收益率<span class="auc-hl-val">按价值M</span></th></tr></thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                            <div class="auc-note" style="margin-top:10px">
+                                <b>两种口径同时给出：</b>左列为资金收益率（你投入的 B 赚了百分之几）；右列为价值捕获率（拿到了物品价值 M 的百分之几）。<br>
+                                其他玩家：分得金额 = 0.95B/(N−1) 与出价成正比——按出价B口径比例恒定，<b>按价值M口径则随出价上升而上升</b>（出价低 → 分得少 → 收益率低）。
                             </div>
                         </div>
-                        <div style="flex-shrink:0;">
-                            <div class="fee-note" style="margin:0 0 4px;">&nbsp;</div>
-                            <button class="btn-sm primary" onclick="calcAuction()">🧮 计算</button>
-                        </div>
                     </div>
                 </div>
 
-                <div id="auctionModeLabel" style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:10px;">—</div>
-                <div id="auctionResults"></div>
-
-                <div style="margin-top:12px;">
-                    <div class="highlight-box" style="margin:0;">
-                        <label style="color:var(--primary-dark);font-weight:500;">✍️ 输入你的实际拍卖价（自定义核算）</label>
-                        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-                            <input type="number" id="auctionCustom" value="100000" min="0" style="max-width:200px;">
-                            <span id="auctionCustomResult" style="font-size:0.85rem;"></span>
-                        </div>
+                <!-- 收益率曲线 -->
+                <div class="auc-panel">
+                    <div class="auc-panel-title">📈 收益率 — 出价曲线</div>
+                    <div id="aucChart"></div>
+                    <div class="auc-legend">
+                        <span><i class="auc-dot" style="background:var(--auc-win)"></i>拍得者收益率</span>
+                        <span><i class="auc-dot" style="background:var(--auc-other)"></i>单个其他玩家收益率</span>
+                        <span><i class="auc-dot" style="background:var(--auc-grab)"></i>抢拍者收益率</span>
+                        <span><i class="auc-dot" style="background:var(--auc-other)"></i>┊ 理论价</span>
+                        <span><i class="auc-dot" style="background:var(--auc-mid)"></i>┊ 合理价</span>
+                        <span><i class="auc-dot" style="background:var(--auc-grab)"></i>┊ 极限价</span>
                     </div>
                 </div>
 
-                <div style="margin-top:14px;">
-                    <div class="formula-box">
-                        <b>公式说明</b><br>
-                        • 个人赚取 = 起拍价 × 0.95 − 拍卖价<br>
-                        • 其他人收益 = 拍卖价 × 0.95 ÷ 5（6人） 或 ÷ 11（12人）<br>
-                        • 6人建议：最佳 = 起拍价 × 68% ｜ 合适 = 起拍价 × 72% ｜ 不亏 = 起拍价 × 79%<br>
-                        • 12人建议：卡价格但不过分 = 起拍价 × 83% ｜ 防止被卡不赚 = 起拍价 × 87%
+                <!-- 四档人数速查 -->
+                <div class="auc-panel">
+                    <div class="auc-panel-title">📊 四档人数 · 三价格点速查（按当前 M）</div>
+                    <div class="auc-table-wrap">
+                        <table id="aucOverview">
+                            <thead><tr><th>人数 N</th><th>其他玩家收益率@理论价</th><th>理论价 B / 拍得收益</th><th>合理价 B / 拍得收益</th><th>极限价 B / 拍得收益</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 模型公式 -->
+                <div class="auc-panel">
+                    <div class="auc-panel-title">📘 模型、公式与假设（v3）</div>
+                    <div class="auc-note">
+                        <b>0. 规则</b>：成交价 B 扣 5% 拍卖手续费后，净额 <code>B×0.95</code> 平分给其余 <code>N−1</code> 名玩家（拍得者不分红）；拍得者在交易行以 M 卖出再扣 5%，净得 <code>M×0.95</code>；他人抢拍必须加价 ≥10%。<br><br>
+                        <b>1. 收益率口径（两种，均可切换）</b><br>
+                        　· <b>按物品价值 M（默认）</b>——收益率 = 净收益 ÷ M，衡量"拿到了物品价值的百分之几"：拍得者 <code>r=(0.95M−B)/M</code>；单个其他玩家 <code>r=0.95B/((N−1)·M)</code>（<b>出价越低收益率越低</b>，因为分得的是成交价的一部分）；抢拍者 <code>r=(0.95M−1.1B)/M</code>。<br>
+                        　· <b>按出价 B</b>——拍得者 <code>r=(0.95M−B)/B</code>（你投入 B 的资金回报率）；单个其他玩家 <code>r=0.95/(N−1)</code>。注意：该口径下其他玩家收益率是<b>常数</b>，因为分得 = 0.95B/(N−1) 与成交价成正比，比例自然恒定——但<b>分得金额本身仍随出价变化</b>，出价低则分得少。<br>
+                        　· 三个价格点的 <b>B 值在两种口径下完全相同</b>（理论/极限点由"净收益相等"决定，与口径无关；合理点的倍数口径也无关），只是收益率的数值含义不同。<br>
+                        <b>2. 理论价格点</b>：令「拍得净收益 = 不拍时分到的钱」<code>0.95M − B = 0.95B/(N−1)</code>（两种口径下均为收益率相等点），解得 <code>B理 = 0.95M·(N−1)/(N−0.05)</code>。人数越多，B理 越逼近 0.95M，拍得者收益趋近 0。<br>
+                        <b>3. 合理价格点</b>：拍得者承担市价波动与现金流压力，理应多赚一点：<br>
+                        　· <b>固定溢价 δ</b>（默认 +5pp）：<code>r拍 = r他 + δ</code>，δ 在当前口径下衡量（按B口径上限 10pp；按M口径上限 ≈ 0.095/(1.1+r他)，约 7.4%~8.6pp，超限会警告）。<br>
+                        　· <b>倍数 α</b>（默认 1.25）：<code>r拍 = α·r他</code>，<code>B合 = 0.95M/(1+α·r他)</code>，两种口径同式；需 α &lt; 1 + 0.1/r他。<br>
+                        <b>4. 极限收益点</b>：出价越低收益越高，但低于临界价时他人加价 10% 抢拍仍有利可图，你必被抢。临界点令 <code>0.95M − 1.1B = 0.95B/(N−1)</code>，解得 <code>B极 = 0.95M/(1.1 + 0.95/(N−1))</code>。此时（按价值M口径）<b>抢拍者收益率 = 其他玩家收益率</b>——抢不抢拿到手的价值一样，故无人抢拍；你的收益 = 其他玩家 + 0.1·B/M（按出价B口径则为 +10%）。⚠️ 临界点恰好无差异，建议实际出价 = <b>极限价 × 1.01</b>。<br>
+                        <b>5. 人数影响</b>：6 人时理论价≈79.8% 市价、其他玩家@理论价 15.2%（按M口径）；100 人时理论价≈95% 市价、其他玩家仅约 0.9%——人越多分红被摊薄，装备越接近市价成交。
                     </div>
                 </div>
             </div>
@@ -3457,45 +3608,7 @@ body {
             window.toggleCraftExpand = function () { craftExpanded = !craftExpanded; calcCraftsman(); };
 
             /* ================= 拍卖计算器 ================= */
-            var STRATS = {
-                six: [{ n: "最佳拍卖价格", p: 0.68 }, { n: "合适的拍卖价格", p: 0.72 }, { n: "不赚钱但不亏", p: 0.79 }],
-                twelve: [{ n: "卡价格但不过分", p: 0.83 }, { n: "防止被卡，不赚的价格", p: 0.87 }]
-            };
-            var AUCTION_DIV = { six: 5, twelve: 11 };
-            function getAuctionMode() { return document.querySelector("input[name=\"auctionMode\"]:checked").value; }
-            window.calcAuction = function () {
-                var start = Math.max(0, Number(document.getElementById("auctionStart").value) || 0);
-                var mode = getAuctionMode();
-                var div = AUCTION_DIV[mode];
-                document.getElementById("auctionModeLabel").innerHTML =
-                    (mode === "six" ? "👥 6人拍卖：个人拍得后其余 <b>5</b> 人分配 → 其他人收益 = 拍卖价 × 0.95 ÷ 5" : "👥 12人拍卖：个人拍得后其余 <b>11</b> 人分配 → 其他人收益 = 拍卖价 × 0.95 ÷ 11");
-                var box = document.getElementById("auctionResults");
-                if (start <= 0) { box.innerHTML = "<div class=\"formula-box\">请输入聚珍行价格</div>"; return; }
-                var html = "";
-                STRATS[mode].forEach(function (s, i) {
-                    var bid = Math.floor(start * s.p);
-                    var personal = Math.floor(start * 0.95 - bid);
-                    var others = Math.floor(bid * 0.95 / div);
-                    html += "<div class=\"strategy-row" + (i === 0 ? " best-row" : "") + "\">" +
-                        "<div class=\"s-name\">" + (i === 0 ? "<span class=\"star\">⭐</span> " : "") + s.n + "</div>" +
-                        "<div class=\"s-cell\">拍卖价<br><strong style=\"color:var(--primary-dark);\">" + fmt(bid) + "</strong></div>" +
-                        "<div class=\"s-cell\">个人赚取<br><strong class=\"" + (personal >= 0 ? "profit-positive" : "profit-negative") + "\">" + (personal >= 0 ? "+" : "") + fmt(personal) + "</strong></div>" +
-                        "<div class=\"s-cell\">其他人收益<br><strong>" + fmt(others) + "</strong></div>" +
-                    "</div>";
-                });
-                box.innerHTML = html;
-                calcCustomAuction();
-            };
-            window.calcCustomAuction = function () {
-                var start = Math.max(0, Number(document.getElementById("auctionStart").value) || 0);
-                var bid = Math.max(0, Number(document.getElementById("auctionCustom").value) || 0);
-                var mode = getAuctionMode();
-                var div = AUCTION_DIV[mode];
-                var personal = Math.floor(start * 0.95 - bid);
-                var others = Math.floor(bid * 0.95 / div);
-                document.getElementById("auctionCustomResult").innerHTML =
-                    "个人赚取：<b class=\"" + (personal >= 0 ? "profit-positive" : "profit-negative") + "\">" + (personal >= 0 ? "+" : "") + fmt(personal) + "</b>　｜　其他人收益：<b>" + fmt(others) + "</b>";
-            };
+            /* 拍卖计算器已独立为 auction_calculator.html，通过 iframe 嵌入「拍卖计算器」面板 */
 
             /* ================= 标签页切换 ================= */
             window.switchTab = function (name) {
@@ -3506,9 +3619,9 @@ body {
                 var panel = document.getElementById("panel-" + name);
                 if (panel) panel.style.display = "block";
                 if (name === "craftsman") calcCraftsman();
-                else if (name === "auction") calcAuction();
                 else if (name === "price") { renderGuildTable(); renderFixedMatTable(); renderGatherTable(); }
                 else if (name === "prices" && window.renderFullPriceTableDOM) renderFullPriceTableDOM();
+                else if (name === "auction" && window.renderAuction) window.renderAuction();
                 window.scrollTo({ top: 0, behavior: "smooth" });
             };
 
@@ -3526,11 +3639,7 @@ body {
             renderFixedMatTable();
             renderGatherTable();
             calcCraftsman();
-            calcAuction();
             document.getElementById("craftStamina").addEventListener("input", calcCraftsman);
-            document.getElementById("auctionStart").addEventListener("change", calcAuction);
-            document.getElementById("auctionStart").addEventListener("input", calcAuction);
-            document.getElementById("auctionCustom").addEventListener("input", calcCustomAuction);
             // 固定材料价格编辑 → 保存数据库并联动制作表
             document.getElementById("fixedMatBody").addEventListener("input", function (e) {
                 var inp = e.target;
@@ -4365,6 +4474,241 @@ body {
             summonBtn.hidden = !dock.classList.contains('closed');
         }
         updateSummon();
+    })();
+    </script>
+
+    <!-- ===================== 拍卖计算器（独立作用域，auc- 前缀） ===================== -->
+    <script>
+    (function () {
+        "use strict";
+        var F = 0.05;
+        function el(id) { return document.getElementById(id); }
+        function getN() {
+            var sel = el("aucN").value;
+            if (sel === "custom") return Math.max(3, parseInt(el("aucNcustom").value) || 3);
+            return parseInt(sel);
+        }
+        function getMode() { return el("aucMode").value; }
+        function getBasis() { return el("aucBasis").value; }
+        function getDelta() { return (parseFloat(el("aucDelta").value) || 0) / 100; }
+        function getAlpha() { return Math.max(1, parseFloat(el("aucAlpha").value) || 1); }
+
+        function otherReturnB(N) { return (1 - F) / (N - 1); }
+
+        function rWin(B, M, basis) { if (!(B > 0)) return NaN; return basis === "bid" ? (M * (1 - F) - B) / B : (M * (1 - F) - B) / M; }
+        function rOther(B, M, N, basis) { if (!(B > 0)) return NaN; var ro = otherReturnB(N); return basis === "bid" ? ro : ro * B / M; }
+        function rGrab(B, M, basis) { if (!(B > 0)) return NaN; return basis === "bid" ? (M * (1 - F) - B * 1.1) / (B * 1.1) : (M * (1 - F) - B * 1.1) / M; }
+
+        function theoryBid(M, N) { return M * (1 - F) * (N - 1) / (N - F); }
+        function limitBid(M, N) { return M * (1 - F) / (1.1 + otherReturnB(N)); }
+        function reasonBid(M, N, mode, val, basis) {
+            var ro = otherReturnB(N);
+            if (mode === "multi") return M * (1 - F) / (1 + val * ro);
+            return basis === "bid" ? M * (1 - F) / (1 + ro + val) : M * ((1 - F) - val) / (1 + ro);
+        }
+        function maxDelta(M, N, basis) { var ro = otherReturnB(N); return basis === "bid" ? 0.10 : 0.095 / (1.1 + ro); }
+
+        var fmt = function (v) { if (!isFinite(v)) return "—"; return Math.round(v).toLocaleString("zh-CN"); };
+        var pct = function (v) { if (!isFinite(v)) return "—"; return (v * 100).toFixed(2) + "%"; };
+        function basisLabel(b) { return b === "bid" ? "按出价 B（资金收益率）" : "按物品价值 M（价值捕获率）"; }
+
+        function render() {
+            var M = Math.max(0, parseFloat(el("aucM").value) || 0);
+            var N = getN();
+            var mode = getMode(), basis = getBasis(), delta = getDelta(), alpha = getAlpha();
+            var ro = otherReturnB(N);
+            var Bt = theoryBid(M, N), Br = reasonBid(M, N, mode, mode === "fixed" ? delta : alpha, basis), Bl = limitBid(M, N);
+            var reasonDesc = mode === "fixed"
+                ? "拍得者收益 = 其他玩家 + " + (delta * 100).toFixed(1).replace(/\.0$/, "") + "%（当前口径）"
+                : "拍得者收益 = 其他玩家 × " + alpha;
+
+            el("aucDeltaWrap").style.display = mode === "fixed" ? "block" : "none";
+            el("aucAlphaWrap").style.display = mode === "fixed" ? "none" : "block";
+            el("aucBasisTag").textContent = "收益率口径：" + basisLabel(basis);
+
+            var warn = el("aucWarn");
+            var maxD = maxDelta(M, N, basis);
+            if (N < 3) {
+                warn.style.display = "block";
+                warn.className = "auc-reco danger";
+                warn.innerHTML = "⚠️ <b>人数至少为 3</b>，请调整自定义人数。";
+            } else if (mode === "fixed" && delta >= maxD) {
+                warn.style.display = "block";
+                warn.className = "auc-reco danger";
+                warn.innerHTML = "⚠️ <b>固定溢价 δ 过大</b>：当前口径下 δ 上限为 <b>" + (maxD * 100).toFixed(1) + "%</b>（否则合理价会低于极限价，无法实现）。请调低 δ。";
+            } else if (mode === "multi" && alpha >= 1 + 0.1 / ro) {
+                warn.style.display = "block";
+                warn.className = "auc-reco danger";
+                warn.innerHTML = "⚠️ <b>倍数 α 过大</b>：需 α &lt; " + (1 + 0.1 / ro).toFixed(2) + "（否则合理价会低于极限价，无法实现）。请调低 α。";
+            } else if (Br < Bl) {
+                warn.style.display = "block";
+                warn.className = "auc-reco danger";
+                warn.innerHTML = "⚠️ <b>合理价（¥" + fmt(Br) + "）已低于极限价（¥" + fmt(Bl) + "）</b>：当前参数无法在「保证不被抢拍」的前提下实现该合理溢价。";
+            } else {
+                warn.style.display = "none";
+            }
+
+            // 三卡片
+            var cards = [
+                { cls: "theory", name: "理论价格点", desc: "拍得者与其他玩家收益相等（公平线）", B: Bt,
+                  formula: "B理 = 0.95×" + fmt(M) + "×(" + N + "−1)/(" + N + "−0.05)" },
+                { cls: "reason", name: "合理价格点", desc: reasonDesc, B: Br,
+                  formula: mode === "fixed"
+                    ? (basis === "bid"
+                        ? "B合 = 0.95×" + fmt(M) + " / (1 + " + (ro * 100).toFixed(2) + "% + " + (delta * 100).toFixed(1).replace(/\.0$/, "") + "%)"
+                        : "B合 = " + fmt(M) + "×(0.95−" + (delta * 100).toFixed(1).replace(/\.0$/, "") + "%) / (1 + " + (ro * 100).toFixed(2) + "%)")
+                    : "B合 = 0.95×" + fmt(M) + " / (1 + " + alpha + "×" + (ro * 100).toFixed(2) + "%)" },
+                { cls: "limit", name: "极限收益点", desc: "抢拍者恰好无利可图，你收益最大化", B: Bl,
+                  formula: "B极 = 0.95×" + fmt(M) + " / (1.1 + " + (ro * 100).toFixed(2) + "%)" }
+            ];
+            el("aucCards").innerHTML = cards.map(function (c) {
+                var rwn = rWin(c.B, M, basis), ron = rOther(c.B, M, N, basis), rgn = rGrab(c.B, M, basis);
+                var hint = c.cls === "limit" ? "⚠️ 临界点抢拍者恰好无差异，实际出价建议 = ¥" + fmt(c.B * 1.01) + "（极限价 ×1.01 缓冲）" : "";
+                return '<div class="auc-card ' + c.cls + '">'
+                    + '<div class="auc-tag">' + c.name + '</div>'
+                    + '<h3>' + c.desc + '</h3>'
+                    + '<div class="auc-formula">' + c.formula + '</div>'
+                    + '<div class="auc-bid">¥' + fmt(c.B) + '</div>'
+                    + '<div class="auc-row"><span class="auc-c-win">拍得者收益率</span><span class="auc-v auc-c-win">' + pct(rwn) + '</span></div>'
+                    + '<div class="auc-row"><span class="auc-c-other">单个其他玩家</span><span class="auc-v auc-c-other">' + pct(ron) + '</span></div>'
+                    + '<div class="auc-row"><span class="auc-c-grab">抢拍者收益率</span><span class="auc-v auc-c-grab">' + pct(rgn) + '</span></div>'
+                    + (hint ? '<div class="auc-note" style="margin-top:8px;">' + hint + '</div>' : '')
+                    + '</div>';
+            }).join("");
+
+            // 出价模拟
+            var Bslider = el("aucB"), Bnum = el("aucBnum");
+            var B = parseFloat(Bnum.value);
+            if (!(B > 0)) { B = Bl; Bnum.value = Math.round(B); }
+            Bslider.min = Math.round(M * 0.5); Bslider.max = Math.round(M * 1.02); Bslider.step = Math.max(1, Math.round(M * 0.005));
+            Bslider.value = Math.round(Math.min(Math.max(B, Bslider.min), Bslider.max));
+
+            var wNet = M * (1 - F) - B, oNet = B * (1 - F) / (N - 1), gNet = M * (1 - F) - B * 1.1;
+            var sign = function (v) { return v >= 0 ? "+¥" + fmt(v) : "−¥" + fmt(-v); };
+            el("aucSimTable").querySelector("tbody").innerHTML =
+                '<tr><td class="auc-c-win">拍得者（你）</td><td class="auc-c-win">' + sign(wNet) + '</td>'
+                + '<td class="auc-c-win">' + pct(rWin(B, M, "bid")) + '</td><td class="auc-c-win">' + pct(rWin(B, M, "value")) + '</td></tr>'
+                + '<tr><td class="auc-c-other">单个其他玩家</td><td class="auc-c-other">+¥' + fmt(oNet) + '</td>'
+                + '<td class="auc-c-other">' + pct(rOther(B, M, N, "bid")) + '</td><td class="auc-c-other">' + pct(rOther(B, M, N, "value")) + '</td></tr>'
+                + '<tr><td class="auc-c-grab">抢拍者(+10%)</td><td class="auc-c-grab">' + sign(gNet) + '</td>'
+                + '<td class="auc-c-grab">' + pct(rGrab(B, M, "bid")) + '</td><td class="auc-c-grab">' + pct(rGrab(B, M, "value")) + '</td></tr>';
+
+            // 建议
+            var reco = el("aucReco");
+            var cls, txt;
+            if (!(M > 0)) {
+                cls = "danger"; txt = "⚠️ 请输入有效的交易行价格 M。";
+            } else if (B < Bl) {
+                cls = "danger";
+                txt = "⚠️ <b>低于极限价</b>：此时他人加价 10% 抢拍仍有利可图，你大概率被抢拍。建议至少出 <b>¥" + fmt(Bl) + "</b>（稳妥再 ×1.01 留缓冲）。";
+            } else if (B <= Br) {
+                cls = "safe";
+                txt = "✅ <b>安全高收益区</b>：你收益率 " + pct(rWin(B, M, basis)) + "（" + basisLabel(basis) + "），高于其他玩家（" + pct(rOther(B, M, N, basis)) + "），且无人愿加价抢拍。越靠近极限价 ¥" + fmt(Bl) + " 你收益越高。";
+            } else if (B <= Bt) {
+                cls = "mid";
+                txt = "🟡 <b>合理区</b>：你收益略高于其他玩家，分配较为公平，但仍安全。";
+            } else if (B <= M * (1 - F)) {
+                cls = "high";
+                txt = "🟠 <b>出价偏高</b>：仍安全（无人愿抢拍），但你收益被压缩（" + pct(rWin(B, M, basis)) + "），建议降至合理价 ¥" + fmt(Br) + " 附近。";
+            } else {
+                cls = "loss";
+                txt = "🔴 <b>已亏损</b>：出价超过市价净售价 ¥" + fmt(M * (1 - F)) + "，拍得即亏（收益率 " + pct(rWin(B, M, basis)) + "），切勿出此价。";
+            }
+            reco.className = "auc-reco " + cls;
+            reco.innerHTML = txt;
+
+            drawChart(M, N, Bt, Br, Bl, ro, basis);
+
+            // 速查表
+            var ns = [6, 12, 90, 100];
+            el("aucOverview").querySelector("tbody").innerHTML = ns.map(function (n) {
+                var bt = theoryBid(M, n), br = reasonBid(M, n, mode, mode === "fixed" ? delta : alpha, basis), bl = limitBid(M, n);
+                return "<tr><td>" + n + " 人</td>"
+                    + '<td class="auc-c-other">' + pct(rOther(bt, M, n, basis)) + "</td>"
+                    + "<td>¥" + fmt(bt) + " / " + pct(rWin(bt, M, basis)) + "</td>"
+                    + "<td>¥" + fmt(br) + " / " + pct(rWin(br, M, basis)) + "</td>"
+                    + "<td>¥" + fmt(bl) + " / " + pct(rWin(bl, M, basis)) + "</td></tr>";
+            }).join("");
+        }
+
+        function drawChart(M, N, Bt, Br, Bl, ro, basis) {
+            var holder = el("aucChart");
+            if (!(M > 0) || N < 2) { holder.innerHTML = '<div class="auc-note">请输入有效的 M 后查看曲线。</div>'; return; }
+            var W = 680, H = 360, m = { l: 62, r: 20, t: 20, b: 48 };
+            var xMin = Math.max(M * 0.5, Bl * 0.97), xMax = M * 1.02;
+            var yMax = Math.max(rWin(xMin, M, basis) * 1.05, rOther(xMax, M, N, basis) * 1.2, 0.05);
+            var yMin = Math.min(-0.10, rGrab(xMax, M, basis) * 1.1);
+            var px = function (b) { return m.l + (b - xMin) / (xMax - xMin) * (W - m.l - m.r); };
+            var py = function (r) { return m.t + (yMax - r) / (yMax - yMin) * (H - m.t - m.b); };
+            var samp = 140;
+
+            function poly(fn) {
+                var parts = [], cur = [];
+                for (var i = 0; i <= samp; i++) {
+                    var b = xMin + (xMax - xMin) * i / samp;
+                    var r = fn(b);
+                    if (!isFinite(r) || r < yMin || r > yMax) {
+                        if (cur.length) { parts.push(cur); cur = []; }
+                    } else {
+                        cur.push([px(b).toFixed(1), py(r).toFixed(1)]);
+                    }
+                }
+                if (cur.length) parts.push(cur);
+                return parts.map(function (p) { return "M" + p.map(function (pt) { return pt[0] + " " + pt[1]; }).join("L"); }).join(" ");
+            }
+
+            function cssv(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+            var gridC = cssv("--border") || "#e3edec";
+            var tickC = cssv("--text-secondary") || "#7c8b8b";
+            var axisC = tickC;
+
+            var grid = "", ticks = "";
+            for (var i = 0; i <= 4; i++) {
+                var r = yMin + (yMax - yMin) * i / 4, y = py(r);
+                grid += '<line x1="' + m.l + '" y1="' + y + '" x2="' + (W - m.r) + '" y2="' + y + '" stroke="' + gridC + '" stroke-width="1"/>';
+                ticks += '<text x="' + (m.l - 8) + '" y="' + (y + 4) + '" fill="' + tickC + '" font-size="11" text-anchor="end">' + (r * 100).toFixed(0) + "%</text>";
+            }
+            for (var j = 0; j <= 4; j++) {
+                var b = xMin + (xMax - xMin) * j / 4, x = px(b);
+                ticks += '<text x="' + x + '" y="' + (H - m.b + 18) + '" fill="' + tickC + '" font-size="11" text-anchor="middle">¥' + fmt(b) + "</text>";
+            }
+
+            var mks = [{ b: Bt, c: cssv("--auc-other") || "#5b9bd5", lab: "理论" }, { b: Br, c: cssv("--auc-mid") || "#e0a93c", lab: "合理" }, { b: Bl, c: cssv("--auc-grab") || "#d9a06a", lab: "极限" }];
+            mks.sort(function (a, b) { return a.b - b.b; });
+            var prevX = -1e9, prevY = 0, markers = "";
+            mks.forEach(function (mk) {
+                var x = px(mk.b);
+                var y = m.t + 12;
+                if (x - prevX < 55) { y = (prevY === 12 ? 26 : 40); }
+                prevX = x; prevY = y;
+                markers += '<line x1="' + x + '" y1="' + m.t + '" x2="' + x + '" y2="' + (H - m.b) + '" stroke="' + mk.c + '" stroke-width="1.5" stroke-dasharray="5 4" opacity="0.85"/>'
+                    + '<text x="' + x + '" y="' + y + '" fill="' + mk.c + '" font-size="11" text-anchor="middle">' + mk.lab + "</text>";
+            });
+
+            holder.innerHTML = '<svg viewBox="0 0 ' + W + " " + H + '" preserveAspectRatio="xMidYMid meet">'
+                + grid + ticks
+                + '<line x1="' + m.l + '" y1="' + m.t + '" x2="' + m.l + '" y2="' + (H - m.b) + '" stroke="' + axisC + '" stroke-width="1.5"/>'
+                + '<line x1="' + m.l + '" y1="' + (H - m.b) + '" x2="' + (W - m.r) + '" y2="' + (H - m.b) + '" stroke="' + axisC + '" stroke-width="1.5"/>'
+                + '<path d="' + poly(function (b) { return rWin(b, M, basis); }) + '" fill="none" stroke="' + (cssv("--auc-win") || "#4f9d97") + '" stroke-width="2.2" stroke-linejoin="round"/>'
+                + '<path d="' + poly(function (b) { return rOther(b, M, N, basis); }) + '" fill="none" stroke="' + (cssv("--auc-other") || "#5b9bd5") + '" stroke-width="2" stroke-linejoin="round"/>'
+                + '<path d="' + poly(function (b) { return rGrab(b, M, basis); }) + '" fill="none" stroke="' + (cssv("--auc-grab") || "#d9a06a") + '" stroke-width="2" stroke-linejoin="round"/>'
+                + markers
+                + '<text x="' + (W - m.r) + '" y="' + (m.t + 4) + '" fill="' + tickC + '" font-size="11" text-anchor="end">出价 B →</text>'
+                + "</svg>";
+        }
+
+        ["aucM", "aucN", "aucNcustom", "aucBasis", "aucMode", "aucDelta", "aucAlpha", "aucBnum"].forEach(function (id) {
+            el(id).addEventListener("input", function (e) {
+                if (id === "aucN") { el("aucNcustomWrap").style.display = e.target.value === "custom" ? "block" : "none"; }
+                render();
+            });
+        });
+        el("aucB").addEventListener("input", function (e) {
+            el("aucBnum").value = e.target.value; render();
+        });
+
+        window.renderAuction = render;
+        render();
     })();
     </script>
 </body>
